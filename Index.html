@@ -1,156 +1,123 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" >
   <title>Lab VR - PC Interativo</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 <body>
   <a-scene>
 
-    <!-- ASSETS -->
     <a-assets>
-      <!-- Imagem da GPU com fundo transparente -->
-      <img id="gpuTexture" src="images/gpu.png">
+      <img alt id="gpuTexture" src="images/gpu.png">
     </a-assets>
 
-    <!-- FUNDO -->
     <a-sky color="#0f172a"></a-sky>
 
-    <!-- LUZES -->
     <a-light type="ambient" intensity="0.6"></a-light>
     <a-light type="directional" position="2 5 3" intensity="0.8"></a-light>
 
-    <!-- CHÃO -->
     <a-plane rotation="-90 0 0" width="30" height="30" color="#020617"></a-plane>
 
-    <!-- MESA -->
-    <a-box position="0 1 0" width="1.2" height="0.3" depth="1.2" color="#8B4513"></a-box>
-
-    <!-- CÂMERA (apenas rotação) -->
+    <!-- 👇 MAIS PERTO AGORA -->
     <a-entity id="cameraRig">
-      <a-camera position="0 1.6 0" wasd-controls-enabled="false">
+      <a-camera position="0 1.7  " wasd-controls-enabled="false">
         <a-cursor color="#00ffff"></a-cursor>
       </a-camera>
     </a-entity>
 
-    <!-- TEXTO PRINCIPAL -->
-    <a-text id="label"
-            value="Clique em um componente"
-            position="0 3 -1"
-            align="center"
-            color="#00ffff"
-            width="6"
-            look-at="#cameraRig">
-    </a-text>
-
-    <!-- CONTAINER PARA COMPONENTES -->
     <a-entity id="componentes"></a-entity>
 
   </a-scene>
 
   <script>
-    // Componente para fazer os objetos olharem para a câmera
-    AFRAME.registerComponent('look-at-camera', {
-      tick: function () {
-        const cam = document.querySelector('#cameraRig');
-        if (!cam) return;
-        this.el.object3D.lookAt(cam.object3D.position);
-      }
-    });
-
-    // Dados dos componentes
     const componentesData = [
-      { name: "Processador", type: "box", w: 0.6, h: 0.08, d: 0.6, color: "#2c2c2c" },
-      { name: "Cooler", type: "cylinder", radius: 0.4, height: 0.2, color: "#888" },
-      { name: "Memória RAM", type: "box", w: 0.8, h: 0.1, d: 0.2, color: "#1e88e5" },
-      // Placa-mãe menor
-      { name: "Placa-mãe", type: "box", w: 1.2, h: 0.1, d: 0.9, color: "#228B22" },
-      { name: "GPU", type: "gpu" },
-      { name: "HD / SSD", type: "box", w: 1, h: 0.2, d: 0.7, color: "#555" },
-      { name: "Fonte", type: "box", w: 0.8, h: 0.5, d: 0.8, color: "#111" }
+      { name: "Processador", description: "Executa instruções do sistema.", type: "box", w: 0.6, h: 0.08, d: 0.6, color: "#2c2c2c" },
+      { name: "Cooler", description: "Resfria o processador.", type: "cylinder", radius: 0.3, height: 0.15, color: "#888" },
+      { name: "Memória RAM", description: "Armazena dados temporários.", type: "box", w: 0.8, h: 0.08, d: 0.2, color: "#1e88e5" },
+      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "box", w: 1, h: 0.08, d: 0.7, color: "#228B22" },
+      { name: "GPU", description: "Processa gráficos.", type: "gpu" },
+      { name: "HD / SSD", description: "Armazenamento permanente.", type: "box", w: 0.8, h: 0.15, d: 0.5, color: "#555" },
+      { name: "Fonte", description: "Distribui energia.", type: "box", w: 0.6, h: 0.4, d: 0.6, color: "#111" }
     ];
 
-    const radius = 3;
-    const centerY = 1.35;
     const container = document.getElementById('componentes');
-    const labelText = document.getElementById('label');
+
+    const cols = 3;
+    const spacingX = 1.6;
+    const spacingY = 1.4;
+
+    const startX = -2;
+    const startY = 2;
+    const z = -2.5;
 
     componentesData.forEach((comp, i) => {
-      const angle = (i / componentesData.length) * 2 * Math.PI;
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
+
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+
+      const x = startX + col * spacingX;
+      const y = startY - row * spacingY;
 
       let el;
+      let showingDesc = false;
 
-      // 🎮 GPU com ilusão de 3D usando imagem transparente
       if (comp.type === "gpu") {
         el = document.createElement("a-entity");
-        el.setAttribute("position", `${x} ${centerY} ${z}`);
-        el.setAttribute("class", "clickable");
-        el.setAttribute("data-name", comp.name);
-        el.setAttribute("look-at", "#cameraRig");
+        el.setAttribute("position", `${x} ${y} ${z}`);
 
-        // Parte frontal
-        const front = document.createElement("a-image");
-        front.setAttribute("src", "#gpuTexture");
-        front.setAttribute("width", "1.8");
-        front.setAttribute("height", "0.8");
-        front.setAttribute("material", "shader: flat; transparent: true; side: double");
-        front.setAttribute("position", "0 0 0.02");
-        el.appendChild(front);
+        const img = document.createElement("a-image");
+        img.setAttribute("src", "#gpuTexture");
+        img.setAttribute("width", "1.1");
+        img.setAttribute("height", "0.55");
 
-        // Parte traseira (simula espessura)
-        const back = document.createElement("a-image");
-        back.setAttribute("src", "#gpuTexture");
-        back.setAttribute("width", "1.8");
-        back.setAttribute("height", "0.8");
-        back.setAttribute("material", "shader: flat; transparent: true; side: double");
-        back.setAttribute("rotation", "0 180 0");
-        back.setAttribute("position", "0 0 -0.02");
-        el.appendChild(back);
+        el.appendChild(img);
       }
-      // Outros componentes
       else if (comp.type === "box") {
         el = document.createElement("a-box");
         el.setAttribute("width", comp.w);
         el.setAttribute("height", comp.h);
         el.setAttribute("depth", comp.d);
         el.setAttribute("color", comp.color);
-        el.setAttribute("position", `${x} ${centerY} ${z}`);
-        el.setAttribute("class", "clickable");
-        el.setAttribute("data-name", comp.name);
-        el.setAttribute("look-at", "#cameraRig");
+        el.setAttribute("position", `${x} ${y} ${z}`);
       }
       else if (comp.type === "cylinder") {
         el = document.createElement("a-cylinder");
         el.setAttribute("radius", comp.radius);
         el.setAttribute("height", comp.height);
         el.setAttribute("color", comp.color);
-        el.setAttribute("position", `${x} ${centerY} ${z}`);
-        el.setAttribute("class", "clickable");
-        el.setAttribute("data-name", comp.name);
-        el.setAttribute("look-at", "#cameraRig");
+        el.setAttribute("position", `${x} ${y} ${z}`);
       }
 
-      // Criar rótulo
-      const label = document.createElement("a-text");
-      label.setAttribute("value", comp.name);
-      label.setAttribute("position", `${x} ${centerY + 0.8} ${z}`);
-      label.setAttribute("align", "center");
-      label.setAttribute("color", "#00ffff");
-      label.setAttribute("look-at", "#cameraRig");
-      label.setAttribute("width", "4");
+      el.setAttribute("look-at", "#cameraRig");
 
-      // Evento de clique
-      el.addEventListener("click", () => {
-        labelText.setAttribute("value", comp.name);
+      const text = document.createElement("a-text");
+      text.setAttribute("value", comp.name);
+      text.setAttribute("position", `${x} ${y + 0.55} ${z}`);
+      text.setAttribute("align", "center");
+      text.setAttribute("color", "#00ffff");
+      text.setAttribute("width", "3");
+
+      function toggle() {
+        showingDesc = !showingDesc;
+
+        text.setAttribute(
+          "value",
+          showingDesc ? comp.description : comp.name
+        );
+
         speechSynthesis.cancel();
-        speechSynthesis.speak(new SpeechSynthesisUtterance(comp.name));
-      });
+        speechSynthesis.speak(
+          new SpeechSynthesisUtterance(
+            showingDesc ? comp.description : comp.name
+          )
+        );
+      }
+
+      el.addEventListener("click", toggle);
 
       container.appendChild(el);
-      container.appendChild(label);
+      container.appendChild(text);
     });
   </script>
 </body>
