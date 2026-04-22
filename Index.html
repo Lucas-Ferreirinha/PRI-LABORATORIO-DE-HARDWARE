@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" >
+  <meta charset="utf-8">
   <title>Lab VR - PC Interativo</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
@@ -10,6 +10,7 @@
 
     <a-assets>
       <img alt id="gpuTexture" src="images/gpu.png">
+      <img alt id="mbTexture" src="images/placa_mae-removebg-preview.png">
     </a-assets>
 
     <a-sky color="#0f172a"></a-sky>
@@ -19,9 +20,9 @@
 
     <a-plane rotation="-90 0 0" width="30" height="30" color="#020617"></a-plane>
 
-    <!-- 👇 MAIS PERTO AGORA -->
+    <!-- Câmera -->
     <a-entity id="cameraRig">
-      <a-camera position="0 1.7  " wasd-controls-enabled="false">
+      <a-camera position="0 1.6 1.2" wasd-controls-enabled="false">
         <a-cursor color="#00ffff"></a-cursor>
       </a-camera>
     </a-entity>
@@ -35,7 +36,7 @@
       { name: "Processador", description: "Executa instruções do sistema.", type: "box", w: 0.6, h: 0.08, d: 0.6, color: "#2c2c2c" },
       { name: "Cooler", description: "Resfria o processador.", type: "cylinder", radius: 0.3, height: 0.15, color: "#888" },
       { name: "Memória RAM", description: "Armazena dados temporários.", type: "box", w: 0.8, h: 0.08, d: 0.2, color: "#1e88e5" },
-      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "box", w: 1, h: 0.08, d: 0.7, color: "#228B22" },
+      { name: "Placa-mae", description: "Conecta todos os componentes.", type: "mb" },
       { name: "GPU", description: "Processa gráficos.", type: "gpu" },
       { name: "HD / SSD", description: "Armazenamento permanente.", type: "box", w: 0.8, h: 0.15, d: 0.5, color: "#555" },
       { name: "Fonte", description: "Distribui energia.", type: "box", w: 0.6, h: 0.4, d: 0.6, color: "#111" }
@@ -73,6 +74,19 @@
 
         el.appendChild(img);
       }
+
+      else if (comp.type === "mb") {
+        el = document.createElement("a-entity");
+        el.setAttribute("position", `${x} ${y} ${z}`);
+
+        const img = document.createElement("a-image");
+        img.setAttribute("src", "#mbTexture");
+        img.setAttribute("width", "1.2");
+        img.setAttribute("height", "0.8");
+
+        el.appendChild(img);
+      }
+
       else if (comp.type === "box") {
         el = document.createElement("a-box");
         el.setAttribute("width", comp.w);
@@ -81,6 +95,7 @@
         el.setAttribute("color", comp.color);
         el.setAttribute("position", `${x} ${y} ${z}`);
       }
+
       else if (comp.type === "cylinder") {
         el = document.createElement("a-cylinder");
         el.setAttribute("radius", comp.radius);
