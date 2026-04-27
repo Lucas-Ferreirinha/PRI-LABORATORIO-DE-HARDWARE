@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz da GPU</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #38bdf8;
+    }
+
+    .pergunta {
+      margin: 20px 0;
+    }
+
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 220px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 22px;
+      color: #22c55e;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Quiz da GPU 🎮</h1>
+
+  <div id="quiz"></div>
+
+  <button onclick="finalizar()">Finalizar</button>
+
+  <div id="resultado"></div>
+
+  <script>
+    let pontuacao = 0;
+    let respondidas = 0;
+
+    const perguntas = [
+      {
+        pergunta: "Qual é a função principal da GPU?",
+        opcoes: ["Armazenar dados", "Processar gráficos", "Fornecer energia"],
+        correta: 1
+      },
+      {
+        pergunta: "GPU é mais usada em:",
+        opcoes: ["Jogos", "Teclado", "Fonte"],
+        correta: 0
+      },
+      {
+        pergunta: "GPU significa:",
+        opcoes: ["Graphics Processing Unit", "General Power Unit", "Global Processor Unit"],
+        correta: 0
+      }
+    ];
+
+    const quizDiv = document.getElementById("quiz");
+
+    perguntas.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.classList.add("pergunta");
+
+      const titulo = document.createElement("p");
+      titulo.innerText = q.pergunta;
+      div.appendChild(titulo);
+
+      q.opcoes.forEach((op, j) => {
+        const btn = document.createElement("button");
+        btn.innerText = op;
+
+        btn.onclick = () => {
+          // evita contar várias vezes
+          if (btn.disabled) return;
+
+          respondidas++;
+
+          if (j === q.correta) {
+            pontuacao++;
+            btn.style.background = "green";
+          } else {
+            btn.style.background = "red";
+          }
+
+          // desativa todas as opções da pergunta
+          Array.from(div.querySelectorAll("button")).forEach(b => {
+            b.disabled = true;
+          });
+        };
+
+        div.appendChild(btn);
+      });
+
+      quizDiv.appendChild(div);
+    });
+
+    function finalizar() {
+      document.getElementById("resultado").innerText =
+        "Pontuação: " + pontuacao + " / " + perguntas.length;
+    }
+  </script>
+
+</body>
+</html>

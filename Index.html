@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+  
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>Lab VR - PC Interativo</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-look-at-component@1.0.0/dist/aframe-look-at-component.min.js"></script>
 </head>
 
 <body>
-  <a-scene>
+  <a-scene cursor="rayOrigin: mouse">
 
     <a-assets>
-      <img alt id="cpuTexture" src="images/processador.png">
-      <img alt id="coolerTexture" src="images/coller.png">
-      <img alt id="gpuTexture" src="images/gpu.png">
-      <img alt id="mbTexture" src="images/placa_mae-removebg-preview.png">
-      <img alt id="hdTexture" src="images/HD.png">
-      <img alt id="ramTexture" src="images/memoriaH.png">
+      <img id="cpuTexture" src="images/processador.png">
+      <img id="coolerTexture" src="images/coller.png">
+      <img id="gpuTexture" src="images/gpu.png">
+      <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
+      <img id="hdTexture" src="images/HD.png">
+      <img id="ramTexture" src="images/memoriaH.png">
     </a-assets>
 
     <a-sky color="#0f172a"></a-sky>
 
-    <a-light type="ambient" intensity="0.6"></a-light>
-    <a-light type="directional" position="2 5 3" intensity="0.8"></a-light>
-
-    <a-plane rotation="-90 0 0" width="30" height="30" color="#020617"></a-plane>
-
-    <a-entity id="cameraRig">
-      <a-camera position="0 1.6 1.2" wasd-controls-enabled="false">
-        <a-cursor color="#00ffff"></a-cursor>
-      </a-camera>
-    </a-entity>
+    <a-camera 
+      position="0 1.6 2"
+      wasd-controls-enabled="false"
+      look-controls="enabled: true">
+    </a-camera>
 
     <a-entity id="componentes"></a-entity>
 
@@ -42,23 +37,25 @@
       { name: "Processador", description: "Executa instruções do sistema.", type: "cpu" },
       { name: "Cooler", description: "Resfria o processador.", type: "cooler" },
       { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram" },
-      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "mb" },
+      { name: "Placa-mae", description: "Conecta todos os componentes.", type: "mb" },
       { name: "GPU", description: "Processa gráficos.", type: "gpu" },
-      { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd" },
-      { name: "Fonte", description: "Distribui energia.", type: "box", w: 0.6, h: 0.4, d: 0.6, color: "#111" }
+      { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd" }
     ];
 
-    const container = document.getElementById('componentes');
+    const container = document.getElementById("componentes");
 
+    // GRID
     const cols = 3;
-    const spacingX = 1.6;
-    const spacingY = 1.4;
+    const spacingX = 2.2;
+    const spacingY = 1.6;
 
-    const startX = -2;
+    const startX = - (cols - 1) * spacingX / 2;
     const startY = 2;
-    const z = -2.5;
+    const z = -3;
 
     componentesData.forEach((comp, i) => {
+
+      let showingDesc = false;
 
       const col = i % cols;
       const row = Math.floor(i / cols);
@@ -66,93 +63,73 @@
       const x = startX + col * spacingX;
       const y = startY - row * spacingY;
 
-      let el;
-      let showingDesc = false;
+      // ===== IMAGEM =====
+      const el = document.createElement("a-entity");
+      const img = document.createElement("a-image");
 
-      // CPU
-      if (comp.type === "cpu") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
-        img.setAttribute("src", "#cpuTexture");
-        img.setAttribute("width", "1.0");
-        img.setAttribute("height", "1.0");
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
+      const textures = {
+        cpu: "#cpuTexture",
+        cooler: "#coolerTexture",
+        gpu: "#gpuTexture",
+        mb: "#mbTexture",
+        hd: "#hdTexture",
+        ram: "#ramTexture"
+      };
 
-      // COOLER (imagem nova)
-      else if (comp.type === "cooler") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
+      img.setAttribute("src", textures[comp.type]);
+      img.setAttribute("width", "1.2");
+      img.setAttribute("height", "0.7");
 
-        img.setAttribute("src", "#coolerTexture");
-        img.setAttribute("width", "0.8");
-        img.setAttribute("height", "0.8");
+      el.appendChild(img);
+      el.setAttribute("position", `${x} ${y} ${z}`);
 
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
-
-      else if (comp.type === "gpu") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
-        img.setAttribute("src", "#gpuTexture");
-        img.setAttribute("width", "1.1");
-        img.setAttribute("height", "0.55");
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
-
-      else if (comp.type === "mb") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
-        img.setAttribute("src", "#mbTexture");
-        img.setAttribute("width", "1.2");
-        img.setAttribute("height", "0.8");
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
-
-      else if (comp.type === "hd") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
-        img.setAttribute("src", "#hdTexture");
-        img.setAttribute("width", "1.0");
-        img.setAttribute("height", "0.7");
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
-
-      else if (comp.type === "ram") {
-        el = document.createElement("a-entity");
-        const img = document.createElement("a-image");
-        img.setAttribute("src", "#ramTexture");
-        img.setAttribute("width", "1.2");
-        img.setAttribute("height", "0.3");
-        img.setAttribute("material", "transparent:true");
-        el.setAttribute("position", `${x} ${y} ${z}`);
-        el.appendChild(img);
-      }
-
-      else if (comp.type === "box") {
-        el = document.createElement("a-box");
-        el.setAttribute("width", comp.w);
-        el.setAttribute("height", comp.h);
-        el.setAttribute("depth", comp.d);
-        el.setAttribute("color", comp.color);
-        el.setAttribute("position", `${x} ${y} ${z}`);
-      }
-
-      el.setAttribute("look-at", "#cameraRig");
-
+      // ===== TEXTO =====
       const text = document.createElement("a-text");
       text.setAttribute("value", comp.name);
-      text.setAttribute("position", `${x} ${y + 0.55} ${z}`);
+      text.setAttribute("position", `${x} ${y + 0.7} ${z}`);
       text.setAttribute("align", "center");
       text.setAttribute("color", "#00ffff");
       text.setAttribute("width", "3");
 
-      function toggle() {
+      // ===== FUNÇÃO DE CRIAR BOTÃO =====
+      function criarBotao(texto, cor, link) {
+        const btn = document.createElement("a-plane");
+
+        btn.setAttribute("width", "1.6");
+        btn.setAttribute("height", "0.4");
+        btn.setAttribute("color", cor);
+        btn.setAttribute("position", `${x} ${y - 0.7} ${z}`);
+        btn.setAttribute("visible", false);
+        btn.setAttribute("opacity", "0.9");
+
+        const txt = document.createElement("a-text");
+        txt.setAttribute("value", texto);
+        txt.setAttribute("align", "center");
+        txt.setAttribute("color", "#fff");
+        txt.setAttribute("width", "3");
+
+        btn.appendChild(txt);
+
+        btn.addEventListener("click", () => {
+          window.location.href = link;
+        });
+
+        return btn;
+      }
+
+      // ===== BOTÃO =====
+      let botao = null;
+
+      if (comp.type === "gpu") {
+        botao = criarBotao("Quiz GPU", "#2563eb", "quiz_gpu.html");
+      }
+
+      if (comp.type === "cpu") {
+        botao = criarBotao("Quiz CPU", "#16a34a", "quiz_cpu.html");
+      }
+
+      // ===== CLICK =====
+      el.addEventListener("click", () => {
         showingDesc = !showingDesc;
 
         text.setAttribute(
@@ -160,18 +137,17 @@
           showingDesc ? comp.description : comp.name
         );
 
-        speechSynthesis.cancel();
-        speechSynthesis.speak(
-          new SpeechSynthesisUtterance(
-            showingDesc ? comp.description : comp.name
-          )
-        );
-      }
-
-      el.addEventListener("click", toggle);
+        if (botao) {
+          botao.setAttribute("visible", showingDesc);
+        }
+      });
 
       container.appendChild(el);
       container.appendChild(text);
+
+      if (botao) {
+        container.appendChild(botao);
+      }
     });
   </script>
 
