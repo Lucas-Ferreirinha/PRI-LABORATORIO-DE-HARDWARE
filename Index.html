@@ -7,22 +7,28 @@
 </head>
 
 <body>
-  <a-scene cursor="rayOrigin: mouse" raycaster="objects: .raycastable">
+  <a-scene>
 
     <a-assets>
-      <img id="cpuTexture" src="images/processador.png">
-      <img id="coolerTexture" src="images/coller.png">
-      <img id="gpuTexture" src="images/gpu.png">
-      <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
-      <img id="hdTexture" src="images/HD.png">
-      <img id="ramTexture" src="images/memoriaH.png">
+      <img alt id="cpuTexture" src="images/processador.png">
+      <img alt id="coolerTexture" src="images/coller.png">
+      <img alt id="gpuTexture" src="images/gpu.png">
+      <img alt id="mbTexture" src="images/placa_mae-removebg-preview.png">
+      <img alt id="hdTexture" src="images/HD.png">
+      <img alt id="ramTexture" src="images/memoriaH.png">
     </a-assets>
 
     <a-sky color="#0f172a"></a-sky>
     <a-grid material="opacity: 0.1; gridColor: #334155"></a-grid>
 
-    <a-camera position="0 1.6 0" look-controls="enabled: true">
-      <a-cursor color="#00ffff" scale="0.5 0.5 0.5"></a-cursor>
+    <!-- Cursor VR (olhar) -->
+    <a-camera position="0 1.6 0">
+      <a-cursor 
+        fuse="true" 
+        fuse-timeout="1500"
+        color="#00ffff"
+        scale="0.5 0.5 0.5">
+      </a-cursor>
     </a-camera>
 
     <a-entity id="componentes"></a-entity>
@@ -56,8 +62,7 @@
       const angleDeg = (angle * 180 / Math.PI);
       group.setAttribute("rotation", `0 ${-angleDeg - 90} 0`);
 
-      // 1. Nome do Componente (Sempre visível acima)
-      // Adicionamos raycaster: false para o texto não "bloquear" o clique na imagem
+      // Título
       const titleText = document.createElement("a-text");
       titleText.setAttribute("value", comp.name);
       titleText.setAttribute("position", "0 1 0");
@@ -65,7 +70,7 @@
       titleText.setAttribute("color", "#00ffff");
       titleText.setAttribute("width", "4");
 
-      // 2. Imagem (O alvo principal do clique)
+      // Imagem (alvo do olhar)
       const img = document.createElement("a-image");
       const textures = {
         cpu: "#cpuTexture", cooler: "#coolerTexture", gpu: "#gpuTexture",
@@ -74,9 +79,9 @@
       img.setAttribute("src", textures[comp.type]);
       img.setAttribute("width", "1.5");
       img.setAttribute("height", "1.2");
-      img.setAttribute("class", "raycastable"); // Habilita o clique aqui
+      img.setAttribute("class", "raycastable");
 
-      // 3. Container de Informações (Aparece ABAIXO da imagem)
+      // Info
       const infoContainer = document.createElement("a-entity");
       infoContainer.setAttribute("position", "0 -0.9 0");
       infoContainer.setAttribute("visible", false);
@@ -93,8 +98,7 @@
       btn.setAttribute("height", "0.4");
       btn.setAttribute("color", comp.color);
       btn.setAttribute("position", "0 -0.3 0.02");
-      // O botão só será clicável quando estiver visível (via JS abaixo)
-      
+
       const btnTxt = document.createElement("a-text");
       btnTxt.setAttribute("value", "Iniciar Quiz");
       btnTxt.setAttribute("align", "center");
@@ -105,16 +109,13 @@
       infoContainer.appendChild(descText);
       infoContainer.appendChild(btn);
 
-      // --- LÓGICA DE CLIQUE ---
-
-      // Clique na Imagem
-      img.addEventListener("click", (e) => {
+      // 👁️ Olhar na imagem (abre/fecha)
+      img.addEventListener("click", () => {
         showingInfo = !showingInfo;
-        
+
         infoContainer.setAttribute("visible", showingInfo);
         img.setAttribute("scale", showingInfo ? "1.1 1.1 1.1" : "1 1 1");
-        
-        // Ativa/Desativa o clique no botão dinamicamente
+
         if (showingInfo) {
           btn.classList.add("raycastable");
         } else {
@@ -122,14 +123,12 @@
         }
       });
 
-      // Clique no Botão
+      // 👁️ Olhar no botão (abre quiz)
       btn.addEventListener("click", (e) => {
-        // Impedir que o clique no botão também ative o clique na imagem (bubbling)
         e.stopPropagation();
         window.location.href = comp.link;
       });
 
-      // Montagem Final
       group.appendChild(titleText);
       group.appendChild(img);
       group.appendChild(infoContainer);

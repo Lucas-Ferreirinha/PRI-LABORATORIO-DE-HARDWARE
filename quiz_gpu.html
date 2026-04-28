@@ -2,62 +2,42 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz da GPU</title>
-
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
-
-    h1 {
-      color: #38bdf8;
-    }
-
-    .pergunta {
-      margin: 20px 0;
-    }
-
-    button {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      width: 220px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    #resultado {
-      margin-top: 30px;
-      font-size: 22px;
-      color: #22c55e;
-    }
-  </style>
+  <title>Quiz VR - GPU</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 
 <body>
+  <a-scene>
 
-  <h1>Quiz da GPU 🎮</h1>
+    <a-sky color="#0f172a"></a-sky>
 
-  <div id="quiz"></div>
+    <a-camera position="0 1.6 0">
+      <a-cursor fuse="true" fuse-timeout="1200" color="#38bdf8"></a-cursor>
+    </a-camera>
 
-  <button onclick="finalizar()">Finalizar</button>
+    <!-- Pergunta -->
+    <a-text id="pergunta"
+            position="0 2.3 -3"
+            align="center"
+            width="4"
+            color="#ffffff">
+    </a-text>
 
-  <div id="resultado"></div>
+    <!-- Opções -->
+    <a-entity id="opcoes"></a-entity>
+
+    <!-- Resultado -->
+    <a-text id="resultado"
+            position="0 1.4 -3"
+            align="center"
+            width="4"
+            color="#22c55e"
+            visible="false">
+    </a-text>
+
+  </a-scene>
 
   <script>
-    let pontuacao = 0;
-    let respondidas = 0;
-
     const perguntas = [
       {
         pergunta: "Qual é a função principal da GPU?",
@@ -76,49 +56,81 @@
       }
     ];
 
-    const quizDiv = document.getElementById("quiz");
+    let atual = 0;
+    let pontuacao = 0;
 
-    perguntas.forEach((q, i) => {
-      const div = document.createElement("div");
-      div.classList.add("pergunta");
+    const perguntaEl = document.getElementById("pergunta");
+    const opcoesEl = document.getElementById("opcoes");
+    const resultadoEl = document.getElementById("resultado");
 
-      const titulo = document.createElement("p");
-      titulo.innerText = q.pergunta;
-      div.appendChild(titulo);
+    function mostrarPergunta() {
+      opcoesEl.innerHTML = "";
 
-      q.opcoes.forEach((op, j) => {
-        const btn = document.createElement("button");
-        btn.innerText = op;
+      const q = perguntas[atual];
+      perguntaEl.setAttribute("value", q.pergunta);
 
-        btn.onclick = () => {
-          // evita contar várias vezes
-          if (btn.disabled) return;
+      // 🔥 empilhamento vertical
+      q.opcoes.forEach((op, i) => {
 
-          respondidas++;
+        const btn = document.createElement("a-plane");
 
-          if (j === q.correta) {
+        btn.setAttribute("width", "2.8");
+        btn.setAttribute("height", "0.6");
+
+        // 👇 AQUI está o ajuste principal (empilhado em Y)
+        btn.setAttribute("position", `0 ${1.2 - i * 0.8} -3`);
+
+        btn.setAttribute("color", "#2563eb");
+
+        const txt = document.createElement("a-text");
+        txt.setAttribute("value", op);
+        txt.setAttribute("align", "center");
+        txt.setAttribute("color", "#fff");
+        txt.setAttribute("width", "4");
+        txt.setAttribute("position", "0 0 0.01");
+
+        btn.appendChild(txt);
+
+        btn.addEventListener("click", () => {
+
+          if (i === q.correta) {
+            btn.setAttribute("color", "green");
             pontuacao++;
-            btn.style.background = "green";
           } else {
-            btn.style.background = "red";
+            btn.setAttribute("color", "red");
           }
 
-          // desativa todas as opções da pergunta
-          Array.from(div.querySelectorAll("button")).forEach(b => {
-            b.disabled = true;
+          Array.from(opcoesEl.children).forEach(b => {
+            b.removeEventListener("click", () => {});
           });
-        };
 
-        div.appendChild(btn);
+          setTimeout(() => {
+            atual++;
+
+            if (atual < perguntas.length) {
+              mostrarPergunta();
+            } else {
+              mostrarResultado();
+            }
+          }, 1000);
+        });
+
+        opcoesEl.appendChild(btn);
       });
-
-      quizDiv.appendChild(div);
-    });
-
-    function finalizar() {
-      document.getElementById("resultado").innerText =
-        "Pontuação: " + pontuacao + " / " + perguntas.length;
     }
+
+    function mostrarResultado() {
+      perguntaEl.setAttribute("visible", false);
+      opcoesEl.setAttribute("visible", false);
+
+      resultadoEl.setAttribute("visible", true);
+      resultadoEl.setAttribute(
+        "value",
+        `Pontuação: ${pontuacao} / ${perguntas.length}`
+      );
+    }
+
+    mostrarPergunta();
   </script>
 
 </body>
