@@ -2,17 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Lab VR - PC Interativo</title>
-
+  <title>Lab VR - PC 360 Interativo</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 
 <body>
-  <a-scene cursor="rayOrigin: mouse">
+  <a-scene cursor="rayOrigin: mouse" raycaster="objects: .raycastable">
 
     <a-assets>
       <img id="cpuTexture" src="images/processador.png">
-      <img id="coolerTexture" src="images/coller.png"> <!-- MANTIDO -->
+      <img id="coolerTexture" src="images/coller.png">
       <img id="gpuTexture" src="images/gpu.png">
       <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
       <img id="hdTexture" src="images/HD.png">
@@ -20,11 +19,10 @@
     </a-assets>
 
     <a-sky color="#0f172a"></a-sky>
+    <a-grid material="opacity: 0.1; gridColor: #334155"></a-grid>
 
-    <a-camera 
-      position="0 1.6 2"
-      wasd-controls-enabled="false"
-      look-controls="enabled: true">
+    <a-camera position="0 1.6 0" look-controls="enabled: true">
+      <a-cursor color="#00ffff" scale="0.5 0.5 0.5"></a-cursor>
     </a-camera>
 
     <a-entity id="componentes"></a-entity>
@@ -33,132 +31,110 @@
 
   <script>
     const componentesData = [
-      { name: "Processador", description: "Executa instruções do sistema.", type: "cpu" },
-      { name: "Cooler", description: "Resfria o processador.", type: "cooler" },
-      { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram" },
-      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae" },
-      { name: "GPU", description: "Processa gráficos.", type: "gpu" },
-      { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd" }
+      { name: "Processador", description: "Executa instruções do sistema.", type: "cpu", link: "quiz_cpu.html", color: "#16a34a" },
+      { name: "Cooler", description: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html", color: "#06b6d4" },
+      { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html", color: "#a855f7" },
+      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae", link: "quiz_placa_mae.html", color: "#f59e0b" },
+      { name: "GPU", description: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html", color: "#2563eb" },
+      { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd", link: "quiz_hd.html", color: "#ef4444" }
     ];
 
     const container = document.getElementById("componentes");
-
-    const cols = 3;
-    const spacingX = 2.2;
-    const spacingY = 1.6;
-
-    const startX = - (cols - 1) * spacingX / 2;
-    const startY = 2;
-    const z = -3;
+    const radius = 3.5; 
+    const total = componentesData.length;
 
     componentesData.forEach((comp, i) => {
+      let showingInfo = false;
 
-      let showingDesc = false;
+      const angle = (i / total) * Math.PI * 2;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
 
-      const col = i % cols;
-      const row = Math.floor(i / cols);
+      const group = document.createElement("a-entity");
+      group.setAttribute("position", `${x} 1.6 ${z}`);
+      
+      const angleDeg = (angle * 180 / Math.PI);
+      group.setAttribute("rotation", `0 ${-angleDeg - 90} 0`);
 
-      const x = startX + col * spacingX;
-      const y = startY - row * spacingY;
+      // 1. Nome do Componente (Sempre visível acima)
+      // Adicionamos raycaster: false para o texto não "bloquear" o clique na imagem
+      const titleText = document.createElement("a-text");
+      titleText.setAttribute("value", comp.name);
+      titleText.setAttribute("position", "0 1 0");
+      titleText.setAttribute("align", "center");
+      titleText.setAttribute("color", "#00ffff");
+      titleText.setAttribute("width", "4");
 
-      const el = document.createElement("a-entity");
+      // 2. Imagem (O alvo principal do clique)
       const img = document.createElement("a-image");
-
       const textures = {
-        cpu: "#cpuTexture",
-        cooler: "#coolerTexture",
-        gpu: "#gpuTexture",
-        placa_mae: "#mbTexture",
-        hd: "#hdTexture",
-        ram: "#ramTexture"
+        cpu: "#cpuTexture", cooler: "#coolerTexture", gpu: "#gpuTexture",
+        placa_mae: "#mbTexture", hd: "#hdTexture", ram: "#ramTexture"
       };
-
       img.setAttribute("src", textures[comp.type]);
-      img.setAttribute("width", "1.2");
-      img.setAttribute("height", "0.7");
+      img.setAttribute("width", "1.5");
+      img.setAttribute("height", "1.2");
+      img.setAttribute("class", "raycastable"); // Habilita o clique aqui
 
-      el.appendChild(img);
-      el.setAttribute("position", `${x} ${y} ${z}`);
+      // 3. Container de Informações (Aparece ABAIXO da imagem)
+      const infoContainer = document.createElement("a-entity");
+      infoContainer.setAttribute("position", "0 -0.9 0");
+      infoContainer.setAttribute("visible", false);
 
-      const text = document.createElement("a-text");
-      text.setAttribute("value", comp.name);
-      text.setAttribute("position", `${x} ${y + 0.7} ${z}`);
-      text.setAttribute("align", "center");
-      text.setAttribute("color", "#00ffff");
-      text.setAttribute("width", "3");
+      const descText = document.createElement("a-text");
+      descText.setAttribute("value", comp.description);
+      descText.setAttribute("position", "0 0.15 0");
+      descText.setAttribute("align", "center");
+      descText.setAttribute("width", "3.5");
+      descText.setAttribute("color", "#ffffff");
 
-      function criarBotao(texto, cor, link) {
-        const btn = document.createElement("a-plane");
+      const btn = document.createElement("a-plane");
+      btn.setAttribute("width", "1.4");
+      btn.setAttribute("height", "0.4");
+      btn.setAttribute("color", comp.color);
+      btn.setAttribute("position", "0 -0.3 0.02");
+      // O botão só será clicável quando estiver visível (via JS abaixo)
+      
+      const btnTxt = document.createElement("a-text");
+      btnTxt.setAttribute("value", "Iniciar Quiz");
+      btnTxt.setAttribute("align", "center");
+      btnTxt.setAttribute("width", "3.5");
+      btnTxt.setAttribute("position", "0 0 0.03");
+      
+      btn.appendChild(btnTxt);
+      infoContainer.appendChild(descText);
+      infoContainer.appendChild(btn);
 
-        btn.setAttribute("width", "1.6");
-        btn.setAttribute("height", "0.4");
-        btn.setAttribute("color", cor);
-        btn.setAttribute("position", `${x} ${y - 0.7} ${z}`);
-        btn.setAttribute("visible", false);
-        btn.setAttribute("opacity", "0.9");
+      // --- LÓGICA DE CLIQUE ---
 
-        const txt = document.createElement("a-text");
-        txt.setAttribute("value", texto);
-        txt.setAttribute("align", "center");
-        txt.setAttribute("color", "#fff");
-        txt.setAttribute("width", "3");
-
-        btn.appendChild(txt);
-
-        btn.addEventListener("click", () => {
-          window.location.href = link;
-        });
-
-        return btn;
-      }
-
-      let botao = null;
-
-      if (comp.type === "cpu") {
-        botao = criarBotao("Quiz CPU", "#16a34a", "quiz_cpu.html");
-      }
-
-      if (comp.type === "gpu") {
-        botao = criarBotao("Quiz GPU", "#2563eb", "quiz_gpu.html");
-      }
-
-      if (comp.type === "cooler") {
-        botao = criarBotao("Quiz Cooler", "#06b6d4", "quiz_cooler.html");
-      }
-
-      if (comp.type === "ram") {
-        botao = criarBotao("Quiz RAM", "#a855f7", "quiz_ram.html");
-      }
-
-      if (comp.type === "placa_mae") {
-        botao = criarBotao("Quiz Placa-mãe", "#f59e0b", "quiz_placa_mae.html");
-      }
-
-      if (comp.type === "hd") {
-        botao = criarBotao("Quiz HD/SSD", "#ef4444", "quiz_hd.html");
-      }
-
-      el.addEventListener("click", () => {
-        showingDesc = !showingDesc;
-
-        text.setAttribute(
-          "value",
-          showingDesc ? comp.description : comp.name
-        );
-
-        if (botao) {
-          botao.setAttribute("visible", showingDesc);
+      // Clique na Imagem
+      img.addEventListener("click", (e) => {
+        showingInfo = !showingInfo;
+        
+        infoContainer.setAttribute("visible", showingInfo);
+        img.setAttribute("scale", showingInfo ? "1.1 1.1 1.1" : "1 1 1");
+        
+        // Ativa/Desativa o clique no botão dinamicamente
+        if (showingInfo) {
+          btn.classList.add("raycastable");
+        } else {
+          btn.classList.remove("raycastable");
         }
       });
 
-      container.appendChild(el);
-      container.appendChild(text);
+      // Clique no Botão
+      btn.addEventListener("click", (e) => {
+        // Impedir que o clique no botão também ative o clique na imagem (bubbling)
+        e.stopPropagation();
+        window.location.href = comp.link;
+      });
 
-      if (botao) {
-        container.appendChild(botao);
-      }
+      // Montagem Final
+      group.appendChild(titleText);
+      group.appendChild(img);
+      group.appendChild(infoContainer);
+      container.appendChild(group);
     });
   </script>
-
 </body>
 </html>
