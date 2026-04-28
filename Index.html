@@ -2,138 +2,190 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Lab VR - PC 360 Interativo</title>
+  <title>Lab VR - Interativo</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 
 <body>
-  <a-scene>
 
-    <a-assets>
-      <img alt id="cpuTexture" src="images/processador.png">
-      <img alt id="coolerTexture" src="images/coller.png">
-      <img alt id="gpuTexture" src="images/gpu.png">
-      <img alt id="mbTexture" src="images/placa_mae-removebg-preview.png">
-      <img alt id="hdTexture" src="images/HD.png">
-      <img alt id="ramTexture" src="images/memoriaH.png">
-    </a-assets>
+<a-scene>
 
-    <a-sky color="#0f172a"></a-sky>
-    <a-grid material="opacity: 0.1; gridColor: #334155"></a-grid>
+  <!-- LUZ -->
+  <a-light type="ambient" intensity="0.9"></a-light>
+  <a-light type="directional" position="2 5 3" intensity="0.6"></a-light>
 
-    <!-- Cursor VR (olhar) -->
-    <a-camera position="0 1.6 0">
-      <a-cursor 
-        fuse="true" 
-        fuse-timeout="1500"
-        color="#00ffff"
-        scale="0.5 0.5 0.5">
-      </a-cursor>
-    </a-camera>
+  <!-- CHÃO -->
+  <a-plane rotation="-90 0 0" width="60" height="60" color="#e5e7eb"></a-plane>
 
-    <a-entity id="componentes"></a-entity>
+  <!-- PAREDES -->
+  <a-box position="0 3 -15" width="30" height="6" depth="0.2" color="#94a3b8"></a-box>
+  <a-box position="-15 3 -7" width="0.2" height="6" depth="30" color="#94a3b8"></a-box>
+  <a-box position="15 3 -7" width="0.2" height="6" depth="30" color="#94a3b8"></a-box>
 
-  </a-scene>
+  <!-- BANCADA PRINCIPAL -->
+  <a-box position="0 0.6 -7" width="14" height="1.2" depth="3" color="#334155"></a-box>
 
-  <script>
-    const componentesData = [
-      { name: "Processador", description: "Executa instruções do sistema.", type: "cpu", link: "quiz_cpu.html", color: "#16a34a" },
-      { name: "Cooler", description: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html", color: "#06b6d4" },
-      { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html", color: "#a855f7" },
-      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae", link: "quiz_placa_mae.html", color: "#f59e0b" },
-      { name: "GPU", description: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html", color: "#2563eb" },
-      { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd", link: "quiz_hd.html", color: "#ef4444" }
-    ];
+  <!-- ASSETS -->
+  <a-assets>
+    <img id="cpuTexture" src="images/processador.png">
+    <img id="coolerTexture" src="images/coller.png">
+    <img id="gpuTexture" src="images/gpu.png">
+    <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
+    <img id="hdTexture" src="images/HD.png">
+    <img id="ramTexture" src="images/memoriaH.png">
+  </a-assets>
 
-    const container = document.getElementById("componentes");
-    const radius = 3.5; 
-    const total = componentesData.length;
+  <!-- CÂMERA -->
+  <a-camera position="0 1.6 2">
+    <a-cursor color="#0ea5e9" raycaster="objects: .clickable"></a-cursor>
+  </a-camera>
 
-    componentesData.forEach((comp, i) => {
-      let showingInfo = false;
+  <a-entity id="componentes"></a-entity>
 
-      const angle = (i / total) * Math.PI * 2;
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
+</a-scene>
 
-      const group = document.createElement("a-entity");
-      group.setAttribute("position", `${x} 1.6 ${z}`);
-      
-      const angleDeg = (angle * 180 / Math.PI);
-      group.setAttribute("rotation", `0 ${-angleDeg - 90} 0`);
+<script>
 
-      // Título
-      const titleText = document.createElement("a-text");
-      titleText.setAttribute("value", comp.name);
-      titleText.setAttribute("position", "0 1 0");
-      titleText.setAttribute("align", "center");
-      titleText.setAttribute("color", "#00ffff");
-      titleText.setAttribute("width", "4");
+const LOOK_TIME = 1500;
 
-      // Imagem (alvo do olhar)
-      const img = document.createElement("a-image");
-      const textures = {
-        cpu: "#cpuTexture", cooler: "#coolerTexture", gpu: "#gpuTexture",
-        placa_mae: "#mbTexture", hd: "#hdTexture", ram: "#ramTexture"
-      };
-      img.setAttribute("src", textures[comp.type]);
-      img.setAttribute("width", "1.5");
-      img.setAttribute("height", "1.2");
-      img.setAttribute("class", "raycastable");
+const componentesData = [
+  { name: "Processador", description: "Executa instruções do sistema.", type: "cpu", link: "quiz_cpu.html" },
+  { name: "Cooler", description: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html" },
+  { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html" },
+  { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae", link: "quiz_placa_mae.html" },
+  { name: "GPU", description: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html" },
+  { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd", link: "quiz_hd.html" }
+];
 
-      // Info
-      const infoContainer = document.createElement("a-entity");
-      infoContainer.setAttribute("position", "0 -0.9 0");
-      infoContainer.setAttribute("visible", false);
+const positions = [
+  { x: -6, z: -7 },
+  { x: -3.5, z: -7 },
+  { x: -1.2, z: -7 },
+  { x: 1.2, z: -7 },
+  { x: 3.5, z: -7 },
+  { x: 6, z: -7 }
+];
 
-      const descText = document.createElement("a-text");
-      descText.setAttribute("value", comp.description);
-      descText.setAttribute("position", "0 0.15 0");
-      descText.setAttribute("align", "center");
-      descText.setAttribute("width", "3.5");
-      descText.setAttribute("color", "#ffffff");
+const textures = {
+  cpu: "#cpuTexture",
+  cooler: "#coolerTexture",
+  gpu: "#gpuTexture",
+  placa_mae: "#mbTexture",
+  hd: "#hdTexture",
+  ram: "#ramTexture"
+};
 
-      const btn = document.createElement("a-plane");
-      btn.setAttribute("width", "1.4");
-      btn.setAttribute("height", "0.4");
-      btn.setAttribute("color", comp.color);
-      btn.setAttribute("position", "0 -0.3 0.02");
+let selected = null;
 
-      const btnTxt = document.createElement("a-text");
-      btnTxt.setAttribute("value", "Iniciar Quiz");
-      btnTxt.setAttribute("align", "center");
-      btnTxt.setAttribute("width", "3.5");
-      btnTxt.setAttribute("position", "0 0 0.03");
-      
-      btn.appendChild(btnTxt);
-      infoContainer.appendChild(descText);
-      infoContainer.appendChild(btn);
+/* HUD */
+const hud = document.createElement("a-entity");
+hud.setAttribute("position", "0 0.8 -7");
 
-      // 👁️ Olhar na imagem (abre/fecha)
-      img.addEventListener("click", () => {
-        showingInfo = !showingInfo;
+const hudBtn = document.createElement("a-plane");
+hudBtn.setAttribute("width", "2");
+hudBtn.setAttribute("height", "0.4");
+hudBtn.setAttribute("color", "#22c55e");
+hudBtn.setAttribute("visible", false);
 
-        infoContainer.setAttribute("visible", showingInfo);
-        img.setAttribute("scale", showingInfo ? "1.1 1.1 1.1" : "1 1 1");
+const hudTxt = document.createElement("a-text");
+hudTxt.setAttribute("value", "INICIAR QUIZ");
+hudTxt.setAttribute("align", "center");
+hudTxt.setAttribute("color", "#000");
 
-        if (showingInfo) {
-          btn.classList.add("raycastable");
-        } else {
-          btn.classList.remove("raycastable");
-        }
-      });
+hudBtn.appendChild(hudTxt);
+hud.appendChild(hudBtn);
+document.querySelector("a-scene").appendChild(hud);
 
-      // 👁️ Olhar no botão (abre quiz)
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        window.location.href = comp.link;
-      });
+hudBtn.addEventListener("click", () => {
+  if (selected) window.location.href = selected.link;
+});
 
-      group.appendChild(titleText);
-      group.appendChild(img);
-      group.appendChild(infoContainer);
-      container.appendChild(group);
-    });
-  </script>
+const container = document.getElementById("componentes");
+
+componentesData.forEach((comp, i) => {
+
+  const pos = positions[i];
+
+  const group = document.createElement("a-entity");
+  group.setAttribute("position", `${pos.x} 1.6 ${pos.z}`);
+
+  /* 🪑 BANCADA INDIVIDUAL (AGORA VISÍVEL DE VERDADE) */
+  const desk = document.createElement("a-box");
+  desk.setAttribute("width", "2.8");
+  desk.setAttribute("height", "0.15");
+  desk.setAttribute("depth", "1.6");
+  desk.setAttribute("color", "#1f2937");
+  desk.setAttribute("position", "0 -1.25 0");
+
+  /* 🖥️ MONITOR FIXO NA BANCADA */
+  const monitor = document.createElement("a-box");
+  monitor.setAttribute("width", "1.2");
+  monitor.setAttribute("height", "0.7");
+  monitor.setAttribute("depth", "0.05");
+  monitor.setAttribute("color", "#0b1220");
+  monitor.setAttribute("position", "0 -0.75 0.75");
+
+  const img = document.createElement("a-image");
+  img.setAttribute("src", textures[comp.type]);
+  img.setAttribute("width", "1.5");
+  img.setAttribute("height", "1.2");
+  img.setAttribute("class", "clickable");
+
+  const text = document.createElement("a-text");
+  text.setAttribute("value", comp.name);
+  text.setAttribute("position", "0 1.1 0");
+  text.setAttribute("align", "center");
+  text.setAttribute("color", "#0ea5e9");
+
+  const ring = document.createElement("a-ring");
+  ring.setAttribute("radius-inner", "0.25");
+  ring.setAttribute("radius-outer", "0.32");
+  ring.setAttribute("theta-length", "0");
+  ring.setAttribute("color", "#0ea5e9");
+  ring.setAttribute("visible", false);
+
+  let timer;
+
+  function startLook() {
+    ring.setAttribute("visible", true);
+    let start = Date.now();
+
+    timer = setInterval(() => {
+      const p = Math.min((Date.now() - start) / LOOK_TIME, 1);
+      ring.setAttribute("theta-length", 360 * p);
+
+      if (p >= 1) {
+        clearInterval(timer);
+        selected = comp;
+        text.setAttribute("value", comp.description);
+        hudBtn.setAttribute("visible", true);
+      }
+    }, 30);
+  }
+
+  function stopLook() {
+    clearInterval(timer);
+    ring.setAttribute("visible", false);
+    ring.setAttribute("theta-length", 0);
+
+    selected = null;
+    text.setAttribute("value", comp.name);
+    hudBtn.setAttribute("visible", false);
+  }
+
+  img.addEventListener("mouseenter", startLook);
+  img.addEventListener("mouseleave", stopLook);
+
+  group.appendChild(desk);
+  group.appendChild(monitor);
+  group.appendChild(img);
+  group.appendChild(text);
+  group.appendChild(ring);
+
+  container.appendChild(group);
+});
+
+</script>
+
 </body>
 </html>

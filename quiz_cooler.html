@@ -2,93 +2,131 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz do Cooler</title>
-
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
-
-    button {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      width: 220px;
-      background: #06b6d4;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    #resultado {
-      margin-top: 30px;
-      font-size: 22px;
-      color: #22c55e;
-    }
-  </style>
+  <title>Quiz VR - Cooler</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 
 <body>
+  <a-scene>
 
-<h1>Quiz do Cooler ❄️</h1>
+    <a-sky color="#0f172a"></a-sky>
 
-<div id="quiz"></div>
+    <a-camera position="0 1.6 0">
+      <a-cursor fuse="true" fuse-timeout="1200" color="#38bdf8"></a-cursor>
+    </a-camera>
 
-<button onclick="finalizar()">Finalizar</button>
+    <!-- Pergunta -->
+    <a-text id="pergunta"
+            position="0 2.3 -3"
+            align="center"
+            width="4"
+            color="#ffffff">
+    </a-text>
 
-<div id="resultado"></div>
+    <!-- Opções -->
+    <a-entity id="opcoes"></a-entity>
 
-<script>
-  let pontuacao = 0;
+    <!-- Resultado -->
+    <a-text id="resultado"
+            position="0 1.4 -3"
+            align="center"
+            width="4"
+            color="#22c55e"
+            visible="false">
+    </a-text>
 
-  const perguntas = [
-    {
-      pergunta: "Qual é a função do cooler?",
-      opcoes: ["Resfriar o processador", "Armazenar dados", "Executar programas"],
-      correta: 0
-    },
-    {
-      pergunta: "Se o cooler parar de funcionar, o que pode acontecer?",
-      opcoes: ["Superaquecimento", "Mais memória", "Melhor desempenho"],
-      correta: 0
+  </a-scene>
+
+  <script>
+    const perguntas = [
+      {
+        pergunta: "Qual é a função do cooler?",
+        opcoes: ["Resfriar o processador", "Armazenar dados", "Executar programas"],
+        correta: 0
+      },
+      {
+        pergunta: "Se o cooler parar de funcionar, o que pode acontecer?",
+        opcoes: ["Superaquecimento", "Mais memória", "Melhor desempenho"],
+        correta: 0
+      }
+    ];
+
+    let atual = 0;
+    let pontuacao = 0;
+
+    const perguntaEl = document.getElementById("pergunta");
+    const opcoesEl = document.getElementById("opcoes");
+    const resultadoEl = document.getElementById("resultado");
+
+    function mostrarPergunta() {
+      opcoesEl.innerHTML = "";
+
+      const q = perguntas[atual];
+      perguntaEl.setAttribute("value", q.pergunta);
+
+      q.opcoes.forEach((op, i) => {
+
+        const btn = document.createElement("a-plane");
+
+        btn.setAttribute("width", "2.8");
+        btn.setAttribute("height", "0.6");
+
+        // empilhamento vertical
+        btn.setAttribute("position", `0 ${1.2 - i * 0.8} -3`);
+
+        btn.setAttribute("color", "#06b6d4");
+
+        const txt = document.createElement("a-text");
+        txt.setAttribute("value", op);
+        txt.setAttribute("align", "center");
+        txt.setAttribute("color", "#fff");
+        txt.setAttribute("width", "4");
+        txt.setAttribute("position", "0 0 0.01");
+
+        btn.appendChild(txt);
+
+        btn.addEventListener("click", () => {
+
+          if (i === q.correta) {
+            btn.setAttribute("color", "green");
+            pontuacao++;
+          } else {
+            btn.setAttribute("color", "red");
+          }
+
+          // trava cliques
+          Array.from(opcoesEl.children).forEach(b => {
+            b.removeEventListener("click", () => {});
+          });
+
+          setTimeout(() => {
+            atual++;
+
+            if (atual < perguntas.length) {
+              mostrarPergunta();
+            } else {
+              mostrarResultado();
+            }
+          }, 1000);
+        });
+
+        opcoesEl.appendChild(btn);
+      });
     }
-  ];
 
-  const quizDiv = document.getElementById("quiz");
+    function mostrarResultado() {
+      perguntaEl.setAttribute("visible", false);
+      opcoesEl.setAttribute("visible", false);
 
-  perguntas.forEach((q) => {
-    const div = document.createElement("div");
+      resultadoEl.setAttribute("visible", true);
+      resultadoEl.setAttribute(
+        "value",
+        `Pontuação: ${pontuacao} / ${perguntas.length}`
+      );
+    }
 
-    div.innerHTML = `<p>${q.pergunta}</p>`;
-
-    q.opcoes.forEach((op, j) => {
-      const btn = document.createElement("button");
-      btn.innerText = op;
-
-      btn.onclick = () => {
-        if (j === q.correta) {
-          pontuacao++;
-          btn.style.background = "green";
-        } else {
-          btn.style.background = "red";
-        }
-      };
-
-      div.appendChild(btn);
-    });
-
-    quizDiv.appendChild(div);
-  });
-
-  function finalizar() {
-    document.getElementById("resultado").innerText =
-      "Pontuação: " + pontuacao;
-  }
-</script>
+    mostrarPergunta();
+  </script>
 
 </body>
 </html>
