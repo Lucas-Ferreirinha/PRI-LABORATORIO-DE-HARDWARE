@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Lab VR</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .titulo-principal {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #38bdf8;
+      text-align: center;
+    }
+
+    .container {
+      background: #111827;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #06b6d4;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #0891b2;
+    }
+
+    .toggle {
+      margin-top: 15px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #38bdf8;
+    }
+
+    #mensagem {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #22c55e;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="titulo-principal">
+  Laboratório de Hardware Virtual
+</div>
+
+<div class="container">
+  <h2 id="titulo">Login</h2>
+
+  <input type="text" id="usuario" placeholder="Usuário">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button onclick="acao()">Entrar</button>
+
+  <div class="toggle" onclick="trocarModo()">
+    Não tem conta? Cadastre-se
+  </div>
+
+  <div id="mensagem"></div>
+</div>
+
+<script>
+  let modoLogin = true;
+
+  function trocarModo() {
+    modoLogin = !modoLogin;
+
+    document.getElementById("titulo").innerText = modoLogin ? "Login" : "Cadastro";
+    document.querySelector("button").innerText = modoLogin ? "Entrar" : "Cadastrar";
+    document.querySelector(".toggle").innerText = modoLogin
+      ? "Não tem conta? Cadastre-se"
+      : "Já tem conta? Fazer login";
+
+    document.getElementById("mensagem").innerText = "";
+  }
+
+  function acao() {
+    const usuario = document.getElementById("usuario").value;
+    const senha = document.getElementById("senha").value;
+    const msg = document.getElementById("mensagem");
+
+    if (!usuario || !senha) {
+      msg.style.color = "red";
+      msg.innerText = "Preencha todos os campos!";
+      return;
+    }
+
+    if (modoLogin) {
+      const userSalvo = localStorage.getItem("usuario");
+      const senhaSalva = localStorage.getItem("senha");
+
+      if (usuario === userSalvo && senha === senhaSalva) {
+        msg.style.color = "#22c55e";
+        msg.innerText = "Login realizado!";
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1000);
+
+      } else {
+        msg.style.color = "red";
+        msg.innerText = "Usuário ou senha incorretos!";
+      }
+
+    } else {
+      localStorage.setItem("usuario", usuario);
+      localStorage.setItem("senha", senha);
+
+      msg.style.color = "#22c55e";
+      msg.innerText = "Conta criada com sucesso!";
+
+      trocarModo();
+    }
+  }
+</script>
+
+</body>
+</html>

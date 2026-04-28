@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  
 <head>
   <meta charset="UTF-8">
   <title>Lab VR - PC Interativo</title>
@@ -13,7 +12,7 @@
 
     <a-assets>
       <img id="cpuTexture" src="images/processador.png">
-      <img id="coolerTexture" src="images/coller.png">
+      <img id="coolerTexture" src="images/coller.png"> <!-- MANTIDO -->
       <img id="gpuTexture" src="images/gpu.png">
       <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
       <img id="hdTexture" src="images/HD.png">
@@ -37,14 +36,13 @@
       { name: "Processador", description: "Executa instruções do sistema.", type: "cpu" },
       { name: "Cooler", description: "Resfria o processador.", type: "cooler" },
       { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram" },
-      { name: "Placa-mae", description: "Conecta todos os componentes.", type: "mb" },
+      { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae" },
       { name: "GPU", description: "Processa gráficos.", type: "gpu" },
       { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd" }
     ];
 
     const container = document.getElementById("componentes");
 
-    // GRID
     const cols = 3;
     const spacingX = 2.2;
     const spacingY = 1.6;
@@ -63,7 +61,6 @@
       const x = startX + col * spacingX;
       const y = startY - row * spacingY;
 
-      // ===== IMAGEM =====
       const el = document.createElement("a-entity");
       const img = document.createElement("a-image");
 
@@ -71,7 +68,7 @@
         cpu: "#cpuTexture",
         cooler: "#coolerTexture",
         gpu: "#gpuTexture",
-        mb: "#mbTexture",
+        placa_mae: "#mbTexture",
         hd: "#hdTexture",
         ram: "#ramTexture"
       };
@@ -83,7 +80,6 @@
       el.appendChild(img);
       el.setAttribute("position", `${x} ${y} ${z}`);
 
-      // ===== TEXTO =====
       const text = document.createElement("a-text");
       text.setAttribute("value", comp.name);
       text.setAttribute("position", `${x} ${y + 0.7} ${z}`);
@@ -91,7 +87,6 @@
       text.setAttribute("color", "#00ffff");
       text.setAttribute("width", "3");
 
-      // ===== FUNÇÃO DE CRIAR BOTÃO =====
       function criarBotao(texto, cor, link) {
         const btn = document.createElement("a-plane");
 
@@ -117,18 +112,32 @@
         return btn;
       }
 
-      // ===== BOTÃO =====
       let botao = null;
-
-      if (comp.type === "gpu") {
-        botao = criarBotao("Quiz GPU", "#2563eb", "quiz_gpu.html");
-      }
 
       if (comp.type === "cpu") {
         botao = criarBotao("Quiz CPU", "#16a34a", "quiz_cpu.html");
       }
 
-      // ===== CLICK =====
+      if (comp.type === "gpu") {
+        botao = criarBotao("Quiz GPU", "#2563eb", "quiz_gpu.html");
+      }
+
+      if (comp.type === "cooler") {
+        botao = criarBotao("Quiz Cooler", "#06b6d4", "quiz_cooler.html");
+      }
+
+      if (comp.type === "ram") {
+        botao = criarBotao("Quiz RAM", "#a855f7", "quiz_ram.html");
+      }
+
+      if (comp.type === "placa_mae") {
+        botao = criarBotao("Quiz Placa-mãe", "#f59e0b", "quiz_placa_mae.html");
+      }
+
+      if (comp.type === "hd") {
+        botao = criarBotao("Quiz HD/SSD", "#ef4444", "quiz_hd.html");
+      }
+
       el.addEventListener("click", () => {
         showingDesc = !showingDesc;
 

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz da Placa-mãe</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 220px;
+      background: #f59e0b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 22px;
+      color: #22c55e;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Quiz da Placa-mãe 🧩</h1>
+
+<div id="quiz"></div>
+
+<button onclick="finalizar()">Finalizar</button>
+
+<div id="resultado"></div>
+
+<script>
+  let pontuacao = 0;
+
+  const perguntas = [
+    {
+      pergunta: "Qual é a função da placa-mãe?",
+      opcoes: ["Conectar todos os componentes", "Armazenar arquivos", "Resfriar o sistema"],
+      correta: 0
+    },
+    {
+      pergunta: "Qual componente é instalado diretamente na placa-mãe?",
+      opcoes: ["Processador", "Monitor", "Teclado"],
+      correta: 0
+    }
+  ];
+
+  const quizDiv = document.getElementById("quiz");
+
+  perguntas.forEach((q) => {
+    const div = document.createElement("div");
+
+    div.innerHTML = `<p>${q.pergunta}</p>`;
+
+    q.opcoes.forEach((op, j) => {
+      const btn = document.createElement("button");
+      btn.innerText = op;
+
+      btn.onclick = () => {
+        if (j === q.correta) {
+          pontuacao++;
+          btn.style.background = "green";
+        } else {
+          btn.style.background = "red";
+        }
+      };
+
+      div.appendChild(btn);
+    });
+
+    quizDiv.appendChild(div);
+  });
+
+  function finalizar() {
+    document.getElementById("resultado").innerText =
+      "Pontuação: " + pontuacao;
+  }
+</script>
+
+</body>
+</html>
