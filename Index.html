@@ -2,43 +2,62 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Lab VR - Interativo</title>
+  <title>Lab VR - Sala Corrigida</title>
+
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-look-at-component@1.0.0/dist/aframe-look-at-component.min.js"></script>
+
+  <style>
+    body { margin: 0; }
+  </style>
 </head>
 
 <body>
 
-<a-scene>
+<a-scene background="color: #cbd5e1">
 
   <!-- LUZ -->
-  <a-light type="ambient" intensity="0.9"></a-light>
-  <a-light type="directional" position="2 5 3" intensity="0.6"></a-light>
+  <a-light type="ambient" intensity="0.6"></a-light>
+  <a-light type="directional" position="0 6 3" intensity="0.8"></a-light>
 
   <!-- CHÃO -->
-  <a-plane rotation="-90 0 0" width="60" height="60" color="#e5e7eb"></a-plane>
+  <a-plane rotation="-90 0 0" width="60" height="60" color="#d1d5db"></a-plane>
 
   <!-- PAREDES -->
-  <a-box position="0 3 -15" width="30" height="6" depth="0.2" color="#94a3b8"></a-box>
-  <a-box position="-15 3 -7" width="0.2" height="6" depth="30" color="#94a3b8"></a-box>
-  <a-box position="15 3 -7" width="0.2" height="6" depth="30" color="#94a3b8"></a-box>
+  <a-box position="0 3 -15" width="30" height="6" depth="0.2" color="#e2e8f0"></a-box>
 
-  <!-- BANCADA PRINCIPAL -->
-  <a-box position="0 0.6 -7" width="14" height="1.2" depth="3" color="#334155"></a-box>
+  <!-- LOUSA -->
+ <a-plane position="0 3 -14.8" width="8" height="3" color="#166534"></a-plane>
+
+  <a-text 
+    value="Laboratorio de Hardware\nEscolha um componente"
+    position="0 3.5 -14.7"
+    align="center"
+    color="#e2e8f0"
+    width="10">
+  </a-text>
+
+  <!-- CAMERA -->
+  <a-entity id="cameraRig">
+    <a-camera position="0 1.6 2">
+      <a-cursor 
+        color="#0ea5e9"
+        fuse="true"
+        fuse-timeout="1200"
+        raycaster="objects: .clickable">
+      </a-cursor>
+    </a-camera>
+  </a-entity>
 
   <!-- ASSETS -->
   <a-assets>
-    <img id="cpuTexture" src="images/processador.png">
-    <img id="coolerTexture" src="images/coller.png">
-    <img id="gpuTexture" src="images/gpu.png">
-    <img id="mbTexture" src="images/placa_mae-removebg-preview.png">
-    <img id="hdTexture" src="images/HD.png">
-    <img id="ramTexture" src="images/memoriaH.png">
+    <img id="cpu" src="images/processador.png">
+    <img id="cooler" src="images/coller.png">
+    <img id="gpu" src="images/gpu.png">
+    <img id="mb" src="images/placa_mae-removebg-preview.png">
+    <img id="hd" src="images/HD.png">
+    <img id="ram" src="images/memoriaH.png">
   </a-assets>
-
-  <!-- CÂMERA -->
-  <a-camera position="0 1.6 2">
-    <a-cursor color="#0ea5e9" raycaster="objects: .clickable"></a-cursor>
-  </a-camera>
 
   <a-entity id="componentes"></a-entity>
 
@@ -48,102 +67,105 @@
 
 const LOOK_TIME = 1500;
 
-const componentesData = [
-  { name: "Processador", description: "Executa instruções do sistema.", type: "cpu", link: "quiz_cpu.html" },
-  { name: "Cooler", description: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html" },
-  { name: "Memória RAM", description: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html" },
-  { name: "Placa-mãe", description: "Conecta todos os componentes.", type: "placa_mae", link: "quiz_placa_mae.html" },
-  { name: "GPU", description: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html" },
-  { name: "HD / SSD", description: "Armazenamento permanente.", type: "hd", link: "quiz_hd.html" }
+const COMPONENTES = [
+  { name: "Processador", desc: "Executa instruções.", type: "cpu", link: "quiz_cpu.html" },
+  { name: "Cooler", desc: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html" },
+  { name: "Memória RAM", desc: "Armazena dados.", type: "ram", link: "quiz_ram.html" },
+  { name: "Placa-mãe", desc: "Conecta tudo.", type: "mb", link: "quiz_placa_mae.html" },
+  { name: "GPU", desc: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html" },
+  { name: "HD / SSD", desc: "Armazenamento.", type: "hd", link: "quiz_hd.html" }
 ];
 
-const positions = [
-  { x: -6, z: -7 },
-  { x: -3.5, z: -7 },
-  { x: -1.2, z: -7 },
-  { x: 1.2, z: -7 },
-  { x: 3.5, z: -7 },
-  { x: 6, z: -7 }
-];
-
-const textures = {
-  cpu: "#cpuTexture",
-  cooler: "#coolerTexture",
-  gpu: "#gpuTexture",
-  placa_mae: "#mbTexture",
-  hd: "#hdTexture",
-  ram: "#ramTexture"
-};
-
-let selected = null;
-
-/* HUD */
-const hud = document.createElement("a-entity");
-hud.setAttribute("position", "0 0.8 -7");
-
-const hudBtn = document.createElement("a-plane");
-hudBtn.setAttribute("width", "2");
-hudBtn.setAttribute("height", "0.4");
-hudBtn.setAttribute("color", "#22c55e");
-hudBtn.setAttribute("visible", false);
-
-const hudTxt = document.createElement("a-text");
-hudTxt.setAttribute("value", "INICIAR QUIZ");
-hudTxt.setAttribute("align", "center");
-hudTxt.setAttribute("color", "#000");
-
-hudBtn.appendChild(hudTxt);
-hud.appendChild(hudBtn);
-document.querySelector("a-scene").appendChild(hud);
-
-hudBtn.addEventListener("click", () => {
-  if (selected) window.location.href = selected.link;
-});
+const POSICOES = [-6, -3.5, -1.2, 1.2, 3.5, 6];
 
 const container = document.getElementById("componentes");
 
-componentesData.forEach((comp, i) => {
+COMPONENTES.forEach((comp, i) => {
 
-  const pos = positions[i];
+  const grupo = document.createElement("a-entity");
+  grupo.setAttribute("position", `${POSICOES[i]} 1.2 -7`);
+  grupo.setAttribute("look-at", "#cameraRig");
 
-  const group = document.createElement("a-entity");
-  group.setAttribute("position", `${pos.x} 1.6 ${pos.z}`);
+  // 🪑 TAMPO
+  const tampo = document.createElement("a-box");
+  tampo.setAttribute("width", "2");
+  tampo.setAttribute("height", "0.12");
+  tampo.setAttribute("depth", "1.2");
+  tampo.setAttribute("color", "#8b5e3c");
+  tampo.setAttribute("position", "0 -0.15 0");
 
-  /* 🪑 BANCADA INDIVIDUAL (AGORA VISÍVEL DE VERDADE) */
-  const desk = document.createElement("a-box");
-  desk.setAttribute("width", "2.8");
-  desk.setAttribute("height", "0.15");
-  desk.setAttribute("depth", "1.6");
-  desk.setAttribute("color", "#1f2937");
-  desk.setAttribute("position", "0 -1.25 0");
+  // 🦵 PERNAS
+  function perna(x, z) {
+    const p = document.createElement("a-box");
+    p.setAttribute("width", "0.08");
+    p.setAttribute("height", "0.8");
+    p.setAttribute("depth", "0.08");
+    p.setAttribute("color", "#1f2937");
+    p.setAttribute("position", `${x} -0.55 ${z}`);
+    return p;
+  }
 
-  /* 🖥️ MONITOR FIXO NA BANCADA */
-  const monitor = document.createElement("a-box");
-  monitor.setAttribute("width", "1.2");
-  monitor.setAttribute("height", "0.7");
-  monitor.setAttribute("depth", "0.05");
-  monitor.setAttribute("color", "#0b1220");
-  monitor.setAttribute("position", "0 -0.75 0.75");
+  grupo.appendChild(perna(-0.9, -0.5));
+  grupo.appendChild(perna(0.9, -0.5));
+  grupo.appendChild(perna(-0.9, 0.5));
+  grupo.appendChild(perna(0.9, 0.5));
+  grupo.appendChild(tampo);
 
+  // 🖼️ IMAGEM (AGORA MAIS ALTA ✅)
   const img = document.createElement("a-image");
-  img.setAttribute("src", textures[comp.type]);
-  img.setAttribute("width", "1.5");
-  img.setAttribute("height", "1.2");
+  img.setAttribute("src", `#${comp.type}`);
+  img.setAttribute("width", "1.3");
+  img.setAttribute("height", "1");
+  img.setAttribute("position", "0 0.25 0"); // 🔥 SUBIU
   img.setAttribute("class", "clickable");
 
-  const text = document.createElement("a-text");
-  text.setAttribute("value", comp.name);
-  text.setAttribute("position", "0 1.1 0");
-  text.setAttribute("align", "center");
-  text.setAttribute("color", "#0ea5e9");
+  // 🏷️ TEXTO (SUBIU JUNTO)
+  const texto = document.createElement("a-text");
+  texto.setAttribute("value", comp.name);
+  texto.setAttribute("position", "0 1.3 0");
+  texto.setAttribute("align", "center");
+  texto.setAttribute("color", "#0ea5e9");
 
+  // 📦 INFO
+  const info = document.createElement("a-entity");
+  info.setAttribute("visible", false);
+
+  const desc = document.createElement("a-text");
+  desc.setAttribute("value", comp.desc);
+  desc.setAttribute("position", "0 1.7 0");
+  desc.setAttribute("align", "center");
+  desc.setAttribute("color", "#111");
+
+  const btn = document.createElement("a-plane");
+  btn.setAttribute("width", "1.5");
+  btn.setAttribute("height", "0.4");
+  btn.setAttribute("color", "#22c55e");
+ btn.setAttribute("position", "0 -0.45 0.3");
+  btn.setAttribute("class", "clickable");
+
+  const btnTxt = document.createElement("a-text");
+  btnTxt.setAttribute("value", "Iniciar Quiz");
+  btnTxt.setAttribute("align", "center");
+  btnTxt.setAttribute("color", "#000");
+
+  btn.appendChild(btnTxt);
+  info.appendChild(desc);
+  info.appendChild(btn);
+
+  btn.addEventListener("click", () => {
+    window.location.href = comp.link;
+  });
+
+  // ⭕ RING
   const ring = document.createElement("a-ring");
   ring.setAttribute("radius-inner", "0.25");
   ring.setAttribute("radius-outer", "0.32");
   ring.setAttribute("theta-length", "0");
   ring.setAttribute("color", "#0ea5e9");
   ring.setAttribute("visible", false);
+  ring.setAttribute("position", "0 0.25 0");
 
+  let ativo = false;
   let timer;
 
   function startLook() {
@@ -156,33 +178,28 @@ componentesData.forEach((comp, i) => {
 
       if (p >= 1) {
         clearInterval(timer);
-        selected = comp;
-        text.setAttribute("value", comp.description);
-        hudBtn.setAttribute("visible", true);
+        ativo = !ativo;
+        info.setAttribute("visible", ativo);
+        texto.setAttribute("value", ativo ? comp.desc : comp.name);
       }
     }, 30);
   }
 
   function stopLook() {
     clearInterval(timer);
-    ring.setAttribute("visible", false);
     ring.setAttribute("theta-length", 0);
-
-    selected = null;
-    text.setAttribute("value", comp.name);
-    hudBtn.setAttribute("visible", false);
+    ring.setAttribute("visible", false);
   }
 
   img.addEventListener("mouseenter", startLook);
   img.addEventListener("mouseleave", stopLook);
 
-  group.appendChild(desk);
-  group.appendChild(monitor);
-  group.appendChild(img);
-  group.appendChild(text);
-  group.appendChild(ring);
+  grupo.appendChild(img);
+  grupo.appendChild(texto);
+  grupo.appendChild(info);
+  grupo.appendChild(ring);
 
-  container.appendChild(group);
+  container.appendChild(grupo);
 });
 
 </script>
