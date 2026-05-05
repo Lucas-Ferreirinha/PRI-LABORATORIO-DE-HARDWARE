@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Lab VR - Sala Corrigida</title>
+  <title>Lab VR - IF Suave</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-look-at-component@1.0.0/dist/aframe-look-at-component.min.js"></script>
@@ -14,34 +14,70 @@
 
 <body>
 
-<a-scene background="color: #cbd5e1">
+<a-scene background="color: #f1f5f9">
 
-  <!-- LUZ -->
-  <a-light type="ambient" intensity="0.6"></a-light>
-  <a-light type="directional" position="0 6 3" intensity="0.8"></a-light>
+  <!-- 💡 LUZES -->
+  <a-light type="ambient" intensity="0.6" color="#ffffff"></a-light>
 
-  <!-- CHÃO -->
-  <a-plane rotation="-90 0 0" width="60" height="60" color="#d1d5db"></a-plane>
+  <a-light 
+    type="directional" 
+    position="5 8 5" 
+    intensity="0.9" 
+    color="#ffffff">
+  </a-light>
 
-  <!-- PAREDES -->
-  <a-box position="0 3 -15" width="30" height="6" depth="0.2" color="#e2e8f0"></a-box>
+  <!-- 🟡 CHÃO (AMARELO SUAVE TOTAL) -->
+  <a-plane 
+    rotation="-90 0 0" 
+    width="60" 
+    height="60" 
+    color="#fefce8">
+  </a-plane>
 
-  <!-- LOUSA -->
- <a-plane position="0 3 -14.8" width="8" height="3" color="#166534"></a-plane>
+  <!-- 🏫 TETO -->
+  <a-plane 
+    position="0 6 -5"
+    rotation="90 0 0"
+    width="30"
+    height="30"
+    color="#f1f5f9">
+  </a-plane>
+
+  <a-plane 
+    position="0 5.99 -5"
+    rotation="90 0 0"
+    width="10"
+    height="10"
+    color="#e2e8f0">
+  </a-plane>
+
+  <!-- 🧱 PAREDE -->
+  <a-box position="0 3 -15" width="30" height="6" depth="0.2" color="#f8fafc"></a-box>
+
+  <!-- faixa verde IF -->
+  <a-box position="0 1 -14.9" width="30" height="1.5" depth="0.21" color="#007a33"></a-box>
+
+  <!-- 🏛️ COLUNAS -->
+  <a-box position="-14 3 -10" width="0.5" height="6" depth="10" color="#334155"></a-box>
+  <a-box position="14 3 -10" width="0.5" height="6" depth="10" color="#334155"></a-box>
+
+  <!-- 🟩 LOUSA -->
+  <a-plane position="0 3 -14.8" width="8" height="3" color="#065f46"></a-plane>
+  <a-box position="0 1.9 -14.7" width="8.2" height="0.2" depth="0.1" color="#334155"></a-box>
 
   <a-text 
     value="Laboratorio de Hardware\nEscolha um componente"
     position="0 3.5 -14.7"
     align="center"
-    color="#e2e8f0"
+    color="#ffffff"
     width="10">
   </a-text>
 
-  <!-- CAMERA -->
+  <!-- 🎥 CAMERA -->
   <a-entity id="cameraRig">
     <a-camera position="0 1.6 2">
       <a-cursor 
-        color="#0ea5e9"
+        color="#007a33"
         fuse="true"
         fuse-timeout="1200"
         raycaster="objects: .clickable">
@@ -49,7 +85,7 @@
     </a-camera>
   </a-entity>
 
-  <!-- ASSETS -->
+  <!-- 📦 ASSETS -->
   <a-assets>
     <img id="cpu" src="images/processador.png">
     <img id="cooler" src="images/coller.png">
@@ -86,15 +122,13 @@ COMPONENTES.forEach((comp, i) => {
   grupo.setAttribute("position", `${POSICOES[i]} 1.2 -7`);
   grupo.setAttribute("look-at", "#cameraRig");
 
-  // 🪑 TAMPO
   const tampo = document.createElement("a-box");
   tampo.setAttribute("width", "2");
   tampo.setAttribute("height", "0.12");
   tampo.setAttribute("depth", "1.2");
-  tampo.setAttribute("color", "#8b5e3c");
+  tampo.setAttribute("color", "#e5e7eb");
   tampo.setAttribute("position", "0 -0.15 0");
 
-  // 🦵 PERNAS
   function perna(x, z) {
     const p = document.createElement("a-box");
     p.setAttribute("width", "0.08");
@@ -111,22 +145,19 @@ COMPONENTES.forEach((comp, i) => {
   grupo.appendChild(perna(0.9, 0.5));
   grupo.appendChild(tampo);
 
-  // 🖼️ IMAGEM (AGORA MAIS ALTA ✅)
   const img = document.createElement("a-image");
   img.setAttribute("src", `#${comp.type}`);
   img.setAttribute("width", "1.3");
   img.setAttribute("height", "1");
-  img.setAttribute("position", "0 0.25 0"); // 🔥 SUBIU
+  img.setAttribute("position", "0 0.25 0");
   img.setAttribute("class", "clickable");
 
-  // 🏷️ TEXTO (SUBIU JUNTO)
   const texto = document.createElement("a-text");
   texto.setAttribute("value", comp.name);
   texto.setAttribute("position", "0 1.3 0");
   texto.setAttribute("align", "center");
-  texto.setAttribute("color", "#0ea5e9");
+  texto.setAttribute("color", "#007a33");
 
-  // 📦 INFO
   const info = document.createElement("a-entity");
   info.setAttribute("visible", false);
 
@@ -139,14 +170,14 @@ COMPONENTES.forEach((comp, i) => {
   const btn = document.createElement("a-plane");
   btn.setAttribute("width", "1.5");
   btn.setAttribute("height", "0.4");
-  btn.setAttribute("color", "#22c55e");
- btn.setAttribute("position", "0 -0.45 0.3");
+  btn.setAttribute("color", "#00a859");
+  btn.setAttribute("position", "0 -0.45 0.3");
   btn.setAttribute("class", "clickable");
 
   const btnTxt = document.createElement("a-text");
   btnTxt.setAttribute("value", "Iniciar Quiz");
   btnTxt.setAttribute("align", "center");
-  btnTxt.setAttribute("color", "#000");
+  btnTxt.setAttribute("color", "#ffffff");
 
   btn.appendChild(btnTxt);
   info.appendChild(desc);
@@ -156,12 +187,11 @@ COMPONENTES.forEach((comp, i) => {
     window.location.href = comp.link;
   });
 
-  // ⭕ RING
   const ring = document.createElement("a-ring");
   ring.setAttribute("radius-inner", "0.25");
   ring.setAttribute("radius-outer", "0.32");
   ring.setAttribute("theta-length", "0");
-  ring.setAttribute("color", "#0ea5e9");
+  ring.setAttribute("color", "#007a33");
   ring.setAttribute("visible", false);
   ring.setAttribute("position", "0 0.25 0");
 
