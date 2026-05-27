@@ -11,69 +11,82 @@
     body {
       margin: 0;
       overflow: hidden;
+      font-family: Arial, sans-serif;
     }
   </style>
 </head>
 
 <body>
 
-<a-scene background="color: #f1f5f9">
+<a-scene background="color: #eaf4f4">
 
-  <!-- LUZ -->
-  <a-light
-    type="ambient"
-    intensity="0.7"
-    color="#ffffff">
-  </a-light>
+  <!-- LUZES -->
+  <a-light type="ambient" intensity="0.8"></a-light>
+  <a-light type="directional" position="0 10 5" intensity="0.7"></a-light>
 
-  <a-light
-    type="directional"
-    position="5 8 5"
-    intensity="1">
-  </a-light>
+  <!-- ASSETS -->
+  <a-assets>
 
-  <!-- CHAO -->
+    <img id="cpu" src="images/processador.png">
+    <img id="cooler" src="images/cooler.png">
+    <img id="gpu" src="images/gpu.png">
+    <img id="mb" src="images/placa_mae-removebg-preview.png">
+    <img id="hd" src="images/HD.png">
+    <img id="ram" src="images/memoriaH.png">
+
+    <!-- TEXTURAS -->
+    <img id="floorTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+    <img id="ceilingTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
+
+  </a-assets>
+
+  <!-- CHÃO PRETO SUAVE -->
   <a-plane
     rotation="-90 0 0"
-    width="60"
-    height="60"
-    color="#fefce8">
+    width="50"
+    height="30"
+    position="0 0 0"
+    material="
+      color: #0f0f12;
+      roughness: 1;
+      metalness: 0;
+      opacity: 0.92;
+    ">
   </a-plane>
 
-  <!-- TETO -->
+  <!-- CORREDOR CENTRAL (ajuda a navegação) -->
+  <a-plane
+    rotation="-90 0 0"
+    position="0 0.01 -4.5"
+    width="18"
+    height="6"
+    material="
+      src: #floorTexture;
+      repeat: 6 3;
+      opacity: 0.25;
+    ">
+  </a-plane>
+
+  <!-- TETO COM TEXTURA LEVE -->
   <a-plane
     position="0 6 -5"
     rotation="90 0 0"
-    width="30"
+    width="50"
     height="30"
-    color="#f1f5f9">
+    material="
+      src: #ceilingTexture;
+      repeat: 8 5;
+      opacity: 0.25;
+    ">
   </a-plane>
 
-  <!-- PAREDE -->
-  <a-box
-    position="0 3 -15"
-    width="30"
-    height="6"
-    depth="0.2"
-    color="#f8fafc">
-  </a-box>
-
-  <!-- FAIXA VERDE -->
-  <a-box
-    position="0 1 -14.9"
-    width="30"
-    height="1.5"
-    depth="0.21"
-    color="#007a33">
-  </a-box>
+  <!-- PAREDES -->
+  <a-box position="0 3 -15" width="50" height="6" depth="0.2" color="#e5e7eb"></a-box>
+  <a-box position="-25 3 -5" width="0.2" height="6" depth="30" color="#e5e7eb"></a-box>
+  <a-box position="25 3 -5" width="0.2" height="6" depth="30" color="#e5e7eb"></a-box>
 
   <!-- LOUSA -->
-  <a-plane
-    position="0 3 -14.8"
-    width="8"
-    height="3"
-    color="#065f46">
-  </a-plane>
+  <a-plane position="0 3 -14.8" width="8" height="3" color="#064e3b"></a-plane>
 
   <a-text
     value="Laboratorio de Hardware\nEscolha um componente"
@@ -84,37 +97,17 @@
     font="https://cdn.aframe.io/fonts/mozillavr.fnt">
   </a-text>
 
-  <!-- COLUNAS -->
-  <a-box position="-14 3 -10" width="0.5" height="6" depth="10" color="#334155"></a-box>
-  <a-box position="14 3 -10" width="0.5" height="6" depth="10" color="#334155"></a-box>
-
-  <!-- CAMERA -->
+  <!-- CÂMERA -->
   <a-entity id="cameraRig">
-
     <a-camera position="0 1.6 2">
-
       <a-cursor
-        color="#00a859"
+        color="#22c55e"
         fuse="true"
-        fuse-timeout="1500"
+        fuse-timeout="1000"
         raycaster="objects: .clickable">
       </a-cursor>
-
     </a-camera>
-
   </a-entity>
-
-  <!-- ASSETS -->
-  <a-assets>
-
-    <img alt id="cpu" src="images/processador.png">
-    <img alt id="cooler" src="images/cooler.png">
-    <img alt id="gpu" src="images/gpu.png">
-    <img alt id="mb" src="images/placa_mae-removebg-preview.png">
-    <img alt id="hd" src="images/HD.png">
-    <img alt id="ram" src="images/memoriaH.png">
-
-  </a-assets>
 
   <!-- COMPONENTES -->
   <a-entity id="componentes"></a-entity>
@@ -124,263 +117,74 @@
 <script>
 
 const COMPONENTES = [
-
-  {
-    name: "Processador",
-    desc: "Executa instrucoes do computador.",
-    type: "cpu",
-    link: "quiz_cpu.html"
-  },
-
-  {
-    name: "Cooler",
-    desc: "Resfria o processador.",
-    type: "cooler",
-    link: "quiz_cooler.html"
-  },
-
-  {
-    name: "Memoria RAM",
-    desc: "Armazena dados temporarios.",
-    type: "ram",
-    link: "quiz_ram.html"
-  },
-
-  {
-    name: "Placa Mae",
-    desc: "Conecta todos os componentes.",
-    type: "mb",
-    link: "quiz_placa_mae.html"
-  },
-
-  {
-    name: "GPU",
-    desc: "Processa os graficos.",
-    type: "gpu",
-    link: "quiz_gpu.html"
-  },
-
-  {
-    name: "HD SSD",
-    desc: "Armazenamento de arquivos.",
-    type: "hd",
-    link: "quiz_hd.html"
-  }
-
+  { name: "Processador", desc: "Executa instruções do computador.", type: "cpu", link: "quiz_cpu.html" },
+  { name: "Cooler", desc: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html" },
+  { name: "Memória RAM", desc: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html" },
+  { name: "Placa Mãe", desc: "Conecta todos os componentes.", type: "mb", link: "quiz_placa_mae.html" },
+  { name: "GPU", desc: "Processa gráficos.", type: "gpu", link: "quiz_gpu.html" },
+  { name: "HD SSD", desc: "Armazenamento de arquivos.", type: "hd", link: "quiz_hd.html" }
 ];
 
-const POSICOES = [-6, -3.5, -1.2, 1.2, 3.5, 6];
+const POSICOES = [-10, -6, -2, 2, 6, 10];
 
 const container = document.getElementById("componentes");
 
 COMPONENTES.forEach((comp, i) => {
 
-  // GRUPO
   const grupo = document.createElement("a-entity");
 
-  grupo.setAttribute(
-    "position",
-    `${POSICOES[i]} 1.2 -7`
-  );
+  // ✔ FIX: agora eles NÃO ficam "voando"
+  grupo.setAttribute("position", `${POSICOES[i]} 0.9 -4.5`);
+  grupo.setAttribute("look-at", "#cameraRig");
 
-  grupo.setAttribute(
-    "look-at",
-    "#cameraRig"
-  );
+  // MESA NO CHÃO
+  const mesa = document.createElement("a-box");
+  mesa.setAttribute("width", "2");
+  mesa.setAttribute("height", "0.1");
+  mesa.setAttribute("depth", "1.2");
+  mesa.setAttribute("color", "#cbd5e1");
+  mesa.setAttribute("position", "0 0 0");
+  grupo.appendChild(mesa);
 
-  // MESA
-  const tampo = document.createElement("a-box");
-
-  tampo.setAttribute("width", "2");
-  tampo.setAttribute("height", "0.12");
-  tampo.setAttribute("depth", "1.2");
-  tampo.setAttribute("color", "#e5e7eb");
-  tampo.setAttribute("position", "0 -0.15 0");
-
-  grupo.appendChild(tampo);
-
-  // PERNAS
-  function criarPerna(x, z) {
-
-    const perna = document.createElement("a-box");
-
-    perna.setAttribute("width", "0.08");
-    perna.setAttribute("height", "0.8");
-    perna.setAttribute("depth", "0.08");
-    perna.setAttribute("color", "#1f2937");
-
-    perna.setAttribute(
-      "position",
-      `${x} -0.55 ${z}`
-    );
-
-    return perna;
-  }
-
-  grupo.appendChild(criarPerna(-0.9, -0.5));
-  grupo.appendChild(criarPerna(0.9, -0.5));
-  grupo.appendChild(criarPerna(-0.9, 0.5));
-  grupo.appendChild(criarPerna(0.9, 0.5));
-
-  // IMAGEM
+  // IMAGEM DO COMPONENTE
   const img = document.createElement("a-image");
-
   img.setAttribute("src", `#${comp.type}`);
-  img.setAttribute("width", "1.3");
-  img.setAttribute("height", "1");
-  img.setAttribute("position", "0 0.25 0");
+  img.setAttribute("width", "1.4");
+  img.setAttribute("height", "1.1");
+  img.setAttribute("position", "0 0.7 0");
   img.setAttribute("class", "clickable");
-
   grupo.appendChild(img);
 
   // TEXTO
   const texto = document.createElement("a-text");
-
   texto.setAttribute("value", comp.name);
-  texto.setAttribute("position", "0 1.3 0");
+  texto.setAttribute("position", "0 1.35 0");
   texto.setAttribute("align", "center");
-  texto.setAttribute("color", "#007a33");
+  texto.setAttribute("color", "#111827");
   texto.setAttribute("width", "4");
-
-  texto.setAttribute(
-    "font",
-    "https://cdn.aframe.io/fonts/mozillavr.fnt"
-  );
-
   grupo.appendChild(texto);
 
-  // INFO
-  const info = document.createElement("a-entity");
-
-  info.setAttribute("visible", "false");
-
-  // DESCRICAO
-  const desc = document.createElement("a-text");
-
-  desc.setAttribute("value", comp.desc);
-  desc.setAttribute("position", "0 1.7 0");
-  desc.setAttribute("align", "center");
-  desc.setAttribute("color", "#111111");
-  desc.setAttribute("width", "4");
-
-  desc.setAttribute(
-    "font",
-    "https://cdn.aframe.io/fonts/mozillavr.fnt"
-  );
-
-  info.appendChild(desc);
-
-  // BOTAO
+  // BOTÃO
   const btn = document.createElement("a-plane");
-
   btn.setAttribute("width", "1.5");
   btn.setAttribute("height", "0.4");
-  btn.setAttribute("color", "#00a859");
-  btn.setAttribute("position", "0 -0.45 0.3");
+  btn.setAttribute("color", "#16a34a");
+  btn.setAttribute("position", "0 0.2 0.3");
   btn.setAttribute("class", "clickable");
 
-  // TEXTO BOTAO
   const btnTxt = document.createElement("a-text");
-
   btnTxt.setAttribute("value", "Iniciar Quiz");
   btnTxt.setAttribute("align", "center");
-  btnTxt.setAttribute("color", "#ffffff");
+  btnTxt.setAttribute("color", "#fff");
   btnTxt.setAttribute("width", "4");
-
-  btnTxt.setAttribute(
-    "font",
-    "https://cdn.aframe.io/fonts/mozillavr.fnt"
-  );
-
   btn.appendChild(btnTxt);
 
-  info.appendChild(btn);
+  grupo.appendChild(btn);
 
-  grupo.appendChild(info);
-
-  // RING
-  const ring = document.createElement("a-ring");
-
-  ring.setAttribute("radius-inner", "0.25");
-  ring.setAttribute("radius-outer", "0.32");
-  ring.setAttribute("theta-length", "0");
-  ring.setAttribute("color", "#007a33");
-  ring.setAttribute("visible", "false");
-  ring.setAttribute("position", "0 0.25 0.01");
-
-  grupo.appendChild(ring);
-
-  // EVENTOS
-  let ativo = false;
-  let timer;
-
-  img.addEventListener("mouseenter", () => {
-
-    ring.setAttribute("visible", "true");
-
-    let inicio = Date.now();
-
-    timer = setInterval(() => {
-
-      const progresso =
-        Math.min(
-          (Date.now() - inicio) / 1500,
-          1
-        );
-
-      ring.setAttribute(
-        "theta-length",
-        360 * progresso
-      );
-
-      if (progresso >= 1) {
-
-        clearInterval(timer);
-
-        ativo = !ativo;
-
-        info.setAttribute(
-          "visible",
-          ativo
-        );
-
-        texto.setAttribute(
-          "value",
-          ativo ? comp.desc : comp.name
-        );
-      }
-
-    }, 30);
-
-  });
-
-  img.addEventListener("mouseleave", () => {
-
-    clearInterval(timer);
-
-    ring.setAttribute("theta-length", "0");
-
-    ring.setAttribute("visible", "false");
-
-  });
-
-  // CLICK BOTAO
   btn.addEventListener("click", () => {
-
-    let pontos =
-      Number(
-        localStorage.getItem("pontuacao")
-      ) || 0;
-
-    pontos += 10;
-
-    localStorage.setItem(
-      "pontuacao",
-      pontos
-    );
-
+    let pontos = Number(localStorage.getItem("pontuacao")) || 0;
+    localStorage.setItem("pontuacao", pontos + 10);
     window.location.href = comp.link;
-
   });
 
   container.appendChild(grupo);
