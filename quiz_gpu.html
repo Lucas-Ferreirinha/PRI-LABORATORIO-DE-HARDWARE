@@ -24,13 +24,21 @@
 
   <!-- CÂMERA -->
   <a-entity>
-    <a-camera position="0 1.6 0"
-      raycaster="objects: .clickable"
-      cursor="fuse: true; fuse-timeout: 800">
 
-      <a-cursor color="#38bdf8"></a-cursor>
+    <a-camera
+      position="0 1.6 0"
+      raycaster="objects: .clickable">
+
+      <!-- CURSOR -->
+      <!-- PRECISA OLHAR 2 SEGUNDOS -->
+      <a-cursor
+        fuse="true"
+        fuse-timeout="2000"
+        color="#38bdf8">
+      </a-cursor>
 
     </a-camera>
+
   </a-entity>
 
   <!-- QUIZ -->
@@ -41,15 +49,17 @@
 <script>
 
 const perguntas = [
+
   {
     pergunta: "Qual é a funcao principal da GPU?",
     opcoes: [
-      "Processar gráficos",
+      "Processar graficos",
       "Armazenar arquivos",
       "Fornecer energia"
     ],
     correta: 0
   },
+
   {
     pergunta: "GPU e mais usada em:",
     opcoes: [
@@ -59,6 +69,7 @@ const perguntas = [
     ],
     correta: 0
   },
+
   {
     pergunta: "GPU significa:",
     opcoes: [
@@ -68,27 +79,45 @@ const perguntas = [
     ],
     correta: 0
   }
+
 ];
 
 let atual = 0;
-let pontos = Number(localStorage.getItem("pontuacao")) || 0;
+let pontos = 0;
 
 const quiz = document.getElementById("quiz");
 
+// ==============================
+// LIMPAR TELA
+// ==============================
 function limpar() {
+
   quiz.innerHTML = "";
+
 }
 
+// ==============================
+// RENDERIZAR QUIZ
+// ==============================
 function renderizar() {
 
   limpar();
 
-  if (atual >= perguntas.length) return resultado();
+  // FINAL
+  if (atual >= perguntas.length) {
+
+    resultado();
+    return;
+
+  }
 
   const q = perguntas[atual];
 
+  // ==============================
   // PERGUNTA
+  // ==============================
   const titulo = document.createElement("a-text");
+
   titulo.setAttribute("value", q.pergunta);
   titulo.setAttribute("position", "0 2.5 -3");
   titulo.setAttribute("align", "center");
@@ -97,20 +126,46 @@ function renderizar() {
 
   quiz.appendChild(titulo);
 
+  // ==============================
+  // PONTUAÇÃO
+  // ==============================
+  const score = document.createElement("a-text");
+
+  score.setAttribute("value", `Pontos: ${pontos}`);
+  score.setAttribute("position", "-2.2 3.2 -3");
+  score.setAttribute("color", "#ffffff");
+  score.setAttribute("width", "4");
+
+  quiz.appendChild(score);
+
+  // ==============================
   // OPÇÕES
+  // ==============================
   q.opcoes.forEach((op, i) => {
 
     const container = document.createElement("a-entity");
-    container.setAttribute("position", `0 ${1.8 - i * 0.9} -3`);
 
+    container.setAttribute(
+      "position",
+      `0 ${1.8 - i * 0.9} -3`
+    );
+
+    // BOTÃO
     const btn = document.createElement("a-plane");
+
     btn.setAttribute("width", "4");
     btn.setAttribute("height", "0.75");
     btn.setAttribute("color", "#2563eb");
     btn.setAttribute("class", "clickable");
-    btn.setAttribute("material", "shader:flat; opacity:0.9");
 
+    btn.setAttribute(
+      "material",
+      "shader:flat; opacity:0.9"
+    );
+
+    // TEXTO
     const txt = document.createElement("a-text");
+
     txt.setAttribute("value", op);
     txt.setAttribute("align", "center");
     txt.setAttribute("color", "#ffffff");
@@ -120,21 +175,55 @@ function renderizar() {
     container.appendChild(btn);
     container.appendChild(txt);
 
+    // EVITA MULTIPLOS CLIQUES
+    let respondido = false;
+
+    // ==============================
+    // RESPOSTA
+    // ==============================
     container.addEventListener("click", () => {
 
+      if (respondido) return;
+
+      respondido = true;
+
+      // CORRETA
       if (i === q.correta) {
+
         btn.setAttribute("color", "#22c55e");
+
         pontos += 10;
-      } else {
-        btn.setAttribute("color", "#ef4444");
+
       }
 
-      localStorage.setItem("pontuacao", pontos);
+      // ERRADA
+      else {
 
+        btn.setAttribute("color", "#ef4444");
+
+      }
+
+      // MOSTRA QUAL ERA A CERTA
+      const botoes = quiz.querySelectorAll("a-plane");
+
+      botoes.forEach((b, index) => {
+
+        if (index === q.correta) {
+
+          b.setAttribute("color", "#22c55e");
+
+        }
+
+      });
+
+      // ESPERA MAIS TEMPO
       setTimeout(() => {
+
         atual++;
+
         renderizar();
-      }, 800);
+
+      }, 3500);
 
     });
 
@@ -144,34 +233,60 @@ function renderizar() {
 
 }
 
-// 🔥 RESULTADO FINAL (PADRÃO IF)
+// ==============================
+// RESULTADO FINAL
+// ==============================
 function resultado() {
 
   limpar();
 
+  // PAINEL
   const painel = document.createElement("a-plane");
-  painel.setAttribute("width", "4.8");
+
+  painel.setAttribute("width", "5");
   painel.setAttribute("height", "3");
   painel.setAttribute("position", "0 1.6 -3");
-  painel.setAttribute("material", "color:#0b1220; opacity:0.95; shader:flat");
 
+  painel.setAttribute(
+    "material",
+    "color:#0b1220; opacity:0.95; shader:flat"
+  );
+
+  // TEXTO
   const txt = document.createElement("a-text");
-  txt.setAttribute("value", `Pontuação final: ${pontos}`);
+
+  txt.setAttribute(
+    "value",
+    `Quiz Finalizado!\nPontuacao: ${pontos}`
+  );
+
   txt.setAttribute("align", "center");
   txt.setAttribute("color", "#38bdf8");
   txt.setAttribute("width", "6");
   txt.setAttribute("position", "0 0.6 0.01");
 
+  // BOTÃO
   const btn = document.createElement("a-plane");
-  btn.setAttribute("width", "2.5");
-  btn.setAttribute("height", "0.7");
-  btn.setAttribute("position", "0 -0.5 0.01");
+
+  btn.setAttribute("width", "2.6");
+  btn.setAttribute("height", "0.8");
+  btn.setAttribute("position", "0 -0.6 0.01");
   btn.setAttribute("color", "#38bdf8");
   btn.setAttribute("class", "clickable");
-  btn.setAttribute("material", "shader:flat; opacity:0.9");
 
+  btn.setAttribute(
+    "material",
+    "shader:flat; opacity:0.9"
+  );
+
+  // TEXTO BOTÃO
   const bt = document.createElement("a-text");
-  bt.setAttribute("value", "Voltar ao laboratório");
+
+  bt.setAttribute(
+    "value",
+    "Voltar ao laboratorio"
+  );
+
   bt.setAttribute("align", "center");
   bt.setAttribute("color", "#ffffff");
   bt.setAttribute("width", "5");
@@ -179,16 +294,21 @@ function resultado() {
 
   btn.appendChild(bt);
 
+  // AÇÃO
   btn.addEventListener("click", () => {
+
     window.location.href = "index.html";
+
   });
 
   painel.appendChild(txt);
   painel.appendChild(btn);
 
   quiz.appendChild(painel);
+
 }
 
+// INICIAR
 renderizar();
 
 </script>

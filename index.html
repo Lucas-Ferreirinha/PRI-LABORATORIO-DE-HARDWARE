@@ -25,162 +25,362 @@
   <!-- LUZES -->
   <a-light type="ambient" intensity="0.6" color="#bde3ff"></a-light>
 
-  <a-light type="directional" intensity="0.8" color="#ffffff" position="0 8 5"></a-light>
+  <a-light type="directional"
+    intensity="0.8"
+    color="#ffffff"
+    position="0 8 5">
+  </a-light>
 
-  <a-light type="point" color="#00d9ff" intensity="0.9" distance="25" position="-10 4 -6"></a-light>
+  <a-light type="point"
+    color="#00d9ff"
+    intensity="0.9"
+    distance="25"
+    position="-10 4 -6">
+  </a-light>
 
-  <a-light type="point" color="#00ff9d" intensity="0.7" distance="25" position="10 4 -6"></a-light>
+  <a-light type="point"
+    color="#00ff9d"
+    intensity="0.7"
+    distance="25"
+    position="10 4 -6">
+  </a-light>
 
   <!-- ASSETS -->
   <a-assets>
+
     <img id="cpu" src="images/processador.png">
     <img id="cooler" src="images/cooler.png">
     <img id="gpu" src="images/gpu.png">
     <img id="mb" src="images/placa_mae-removebg-preview.png">
     <img id="hd" src="images/HD.png">
     <img id="ram" src="images/memoriaH.png">
+
   </a-assets>
 
   <!-- CHÃO -->
-  <a-plane rotation="-90 0 0" width="60" height="40" position="0 0 0"
+  <a-plane
+    rotation="-90 0 0"
+    width="60"
+    height="40"
+    position="0 0 0"
     material="color: #05070d; roughness: 0.9; metalness: 0.2;">
   </a-plane>
 
   <!-- LINHAS -->
-  <a-box position="0 0.01 -4.5" width="22" height="0.02" depth="0.15" color="#00d9ff"></a-box>
-  <a-box position="0 0.01 -7" width="22" height="0.02" depth="0.15" color="#00ff9d"></a-box>
+  <a-box
+    position="0 0.01 -4.5"
+    width="22"
+    height="0.02"
+    depth="0.15"
+    color="#00d9ff">
+  </a-box>
+
+  <a-box
+    position="0 0.01 -7"
+    width="22"
+    height="0.02"
+    depth="0.15"
+    color="#00ff9d">
+  </a-box>
 
   <!-- TETO -->
-  <a-plane position="0 6 -5" rotation="90 0 0" width="60" height="40"
+  <a-plane
+    position="0 6 -5"
+    rotation="90 0 0"
+    width="60"
+    height="40"
     material="color: #0b1220; roughness: 1; opacity: 0.98;">
   </a-plane>
 
   <!-- PAREDES -->
-  <a-box position="0 3 -15" width="50" height="6" depth="0.2"
+  <a-box
+    position="0 3 -15"
+    width="50"
+    height="6"
+    depth="0.2"
     material="color: #111827; metalness: 0.15; roughness: 0.7;">
   </a-box>
 
-  <a-box position="-25 3 -5" width="0.2" height="6" depth="30" color="#0f172a"></a-box>
-  <a-box position="25 3 -5" width="0.2" height="6" depth="30" color="#0f172a"></a-box>
+  <a-box
+    position="-25 3 -5"
+    width="0.2"
+    height="6"
+    depth="30"
+    color="#0f172a">
+  </a-box>
 
-  <!-- LOUSA (CORRIGIDA LEITURA + ACENTOS OK) -->
-  <a-plane position="0 4.2 -14.7" width="9" height="2.2"
-    material="color: #031926; emissive: #0a4b78; emissiveIntensity: 0.6; opacity: 0.98;">
+  <a-box
+    position="25 3 -5"
+    width="0.2"
+    height="6"
+    depth="30"
+    color="#0f172a">
+  </a-box>
+
+  <!-- LOUSA -->
+  <a-plane
+    position="0 4.2 -14.7"
+    width="9"
+    height="2.2"
+    material="color: #031926;
+    emissive: #0a4b78;
+    emissiveIntensity: 0.6;
+    opacity: 0.98;">
   </a-plane>
 
-  <a-text value="LABORATÓRIO VR IF"
+  <a-text
+    value="LABORATÓRIO VR IF"
     position="0 4.9 -14.6"
     align="center"
     color="#ffffff"
     width="10">
   </a-text>
 
-  <a-text value="Olhe 2 segundos para alternar informações"
+  <a-text
+    value="Olhe 2 segundos para interagir"
     position="0 4.35 -14.6"
     align="center"
     color="#cbd5e1"
     width="8">
   </a-text>
 
+  <!-- PONTUAÇÃO -->
+  <a-text
+    id="scoreText"
+    value="Pontos: 0"
+    position="-4 5.5 -10"
+    color="#00ffcc"
+    width="8">
+  </a-text>
+
   <!-- CÂMERA -->
   <a-entity id="cameraRig">
-    <a-camera position="0 1.6 2">
-      <a-cursor color="#00e5ff" fuse="true" fuse-timeout="1200"
-        raycaster="objects: .clickable"></a-cursor>
+
+    <a-camera
+      position="0 1.6 2"
+      raycaster="objects: .clickable">
+
+      <!-- CURSOR -->
+      <!-- OLHAR 2 SEGUNDOS -->
+      <a-cursor
+        color="#00e5ff"
+        fuse="true"
+        fuse-timeout="2000">
+      </a-cursor>
+
     </a-camera>
+
   </a-entity>
 
+  <!-- COMPONENTES -->
   <a-entity id="componentes"></a-entity>
 
 </a-scene>
 
 <script>
 
+// ==============================
+// COMPONENTES
+// ==============================
 const COMPONENTES = [
-  { name: "Processador", desc: "Executa instrucoes do computador.", type: "cpu", link: "quiz_cpu.html" },
-  { name: "Cooler", desc: "Resfria o processador.", type: "cooler", link: "quiz_cooler.html" },
-  { name: "Memória RAM", desc: "Armazena dados temporários.", type: "ram", link: "quiz_ram.html" },
-  { name: "Placa-Mae", desc: "Conecta os componentes.", type: "mb", link: "quiz_placa_mae.html" },
-  { name: "GPU", desc: "Processa graficos do computador.", type: "gpu", link: "quiz_gpu.html" },
-  { name: "HD SSD", desc: "Armazena arquivos e sistema.", type: "hd", link: "quiz_hd.html" }
+
+  {
+    name: "Processador",
+    desc: "Executa instrucoes do computador.",
+    type: "cpu",
+    link: "quiz_cpu.html",
+    color: "#38bdf8"
+  },
+
+  {
+    name: "Cooler",
+    desc: "Resfria o processador.",
+    type: "cooler",
+    link: "quiz_cooler.html",
+    color: "#22c55e"
+  },
+
+  {
+    name: "Memoria RAM",
+    desc: "Armazena dados temporarios.",
+    type: "ram",
+    link: "quiz_ram.html",
+    color: "#a855f7"
+  },
+
+  {
+    name: "Placa-Mae",
+    desc: "Conecta os componentes.",
+    type: "mb",
+    link: "quiz_placa_mae.html",
+    color: "#f59e0b"
+  },
+
+  {
+    name: "GPU",
+    desc: "Processa graficos do computador.",
+    type: "gpu",
+    link: "quiz_gpu.html",
+    color: "#2563eb"
+  },
+
+  {
+    name: "HD/SSD",
+    desc: "Armazena arquivos e sistema.",
+    type: "hd",
+    link: "quiz_hd.html",
+    color: "#ef4444"
+  }
+
 ];
 
 const POSICOES = [-7.5, -4.5, -1.5, 1.5, 4.5, 7.5];
 
 const container = document.getElementById("componentes");
 
+let pontos = Number(localStorage.getItem("pontuacao")) || 0;
+
+const scoreText = document.getElementById("scoreText");
+
+scoreText.setAttribute("value", `Pontos: ${pontos}`);
+
+// ==============================
+// CRIAR COMPONENTES
+// ==============================
 COMPONENTES.forEach((comp, i) => {
 
   const grupo = document.createElement("a-entity");
 
-  grupo.setAttribute("position", `${POSICOES[i]} 0.9 -4.8`);
-  grupo.setAttribute("look-at", "#cameraRig");
+  grupo.setAttribute(
+    "position",
+    `${POSICOES[i]} 0.9 -4.8`
+  );
 
+  grupo.setAttribute(
+    "look-at",
+    "#cameraRig"
+  );
+
+  // ==============================
   // BASE
+  // ==============================
   const mesa = document.createElement("a-box");
+
   mesa.setAttribute("width", "2");
   mesa.setAttribute("height", "0.1");
   mesa.setAttribute("depth", "1.2");
   mesa.setAttribute("color", "#1e293b");
+
   grupo.appendChild(mesa);
 
+  // ==============================
   // IMAGEM
+  // ==============================
   const img = document.createElement("a-image");
+
   img.setAttribute("src", `#${comp.type}`);
   img.setAttribute("width", "1.35");
   img.setAttribute("height", "1.05");
   img.setAttribute("position", "0 0.7 0");
-  img.setAttribute("class", "clickable");
+
+  img.setAttribute(
+    "class",
+    "clickable"
+  );
+
   grupo.appendChild(img);
 
-  // TEXTO (ACENTOS AGORA OK)
+  // ==============================
+  // TEXTO
+  // ==============================
   const texto = document.createElement("a-text");
+
   texto.setAttribute("value", comp.name);
   texto.setAttribute("position", "0 1.5 0");
   texto.setAttribute("align", "center");
   texto.setAttribute("color", "#e2e8f0");
   texto.setAttribute("width", "5");
+
   grupo.appendChild(texto);
 
+  // ==============================
   // BOTÃO
+  // ==============================
   const btn = document.createElement("a-plane");
-  btn.setAttribute("width", "1.5");
-  btn.setAttribute("height", "0.4");
-  btn.setAttribute("position", "0 0.2 0.3");
-  btn.setAttribute("class", "clickable");
-  btn.setAttribute("material", "color:#00b7ff; emissive:#0077ff; emissiveIntensity:0.35");
 
+  btn.setAttribute("width", "1.6");
+  btn.setAttribute("height", "0.45");
+  btn.setAttribute("position", "0 0.2 0.3");
+
+  btn.setAttribute(
+    "class",
+    "clickable"
+  );
+
+  btn.setAttribute(
+    "material",
+    `color:${comp.color};
+    emissive:${comp.color};
+    emissiveIntensity:0.35`
+  );
+
+  // TEXTO BOTÃO
   const btnTxt = document.createElement("a-text");
-  btnTxt.setAttribute("value", "Iniciar Quiz");
+
+  btnTxt.setAttribute(
+    "value",
+    "Iniciar Quiz"
+  );
+
   btnTxt.setAttribute("align", "center");
   btnTxt.setAttribute("color", "#ffffff");
   btnTxt.setAttribute("width", "4");
+
   btn.appendChild(btnTxt);
 
   grupo.appendChild(btn);
 
-  // TROCA TEXTO (2s)
+  // ==============================
+  // MOSTRAR DESCRIÇÃO
+  // ==============================
   let estado = false;
   let interval;
 
   img.addEventListener("mouseenter", () => {
+
     interval = setInterval(() => {
+
       estado = !estado;
-      texto.setAttribute("value", estado ? comp.desc : comp.name);
+
+      texto.setAttribute(
+        "value",
+        estado ? comp.desc : comp.name
+      );
+
     }, 2000);
+
   });
 
   img.addEventListener("mouseleave", () => {
+
     clearInterval(interval);
+
     estado = false;
-    texto.setAttribute("value", comp.name);
+
+    texto.setAttribute(
+      "value",
+      comp.name
+    );
+
   });
 
-  // CLICK QUIZ
+  // ==============================
+  // INICIAR QUIZ
+  // ==============================
   btn.addEventListener("click", () => {
-    let pontos = Number(localStorage.getItem("pontuacao")) || 0;
-    localStorage.setItem("pontuacao", pontos + 10);
+
     window.location.href = comp.link;
+
   });
 
   container.appendChild(grupo);
