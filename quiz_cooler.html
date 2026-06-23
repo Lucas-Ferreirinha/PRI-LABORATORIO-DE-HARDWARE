@@ -75,7 +75,7 @@ const perguntas = [
 ];
 
 let atual = 0;
-let pontos = 0;
+let pontosQuiz = 0;
 
 const quiz = document.getElementById("quiz");
 
@@ -111,12 +111,16 @@ function renderizar() {
   // -----------------------------
   // PONTUAÇÃO
   // -----------------------------
-  const pontuacao = document.createElement("a-text");
+ const pontuacao = document.createElement("a-text");
 
-  pontuacao.setAttribute("value", `Pontos: ${pontos}`);
-  pontuacao.setAttribute("position", "-2.2 3.2 -3");
-  pontuacao.setAttribute("color", "#ffffff");
-  pontuacao.setAttribute("width", "4");
+pontuacao.setAttribute(
+  "value",
+  `Pontos neste quiz: ${pontosQuiz}`
+);
+
+pontuacao.setAttribute("position", "-2.2 3.2 -3");
+pontuacao.setAttribute("color", "#ffffff");
+pontuacao.setAttribute("width", "4");
 
   quiz.appendChild(pontuacao);
 
@@ -172,7 +176,7 @@ function renderizar() {
 
         btn.setAttribute("color", "#22c55e");
 
-        pontos += 10;
+       pontosQuiz += 10;
       }
 
       // -----------------------------
@@ -222,7 +226,24 @@ function renderizar() {
 function resultado() {
 
   limpar();
+  
+  if (!localStorage.getItem("quiz_cooler_concluido")) {
 
+  let pontosGerais =
+  Number(localStorage.getItem("pontuacao")) || 0;
+
+  pontosGerais += pontosQuiz;
+
+  localStorage.setItem(
+    "pontuacao",
+    pontosGerais
+  );
+
+  localStorage.setItem(
+    "quiz_cooler_concluido",
+    "true"
+  );
+}
   // PAINEL
   const painel = document.createElement("a-plane");
 
@@ -235,10 +256,13 @@ function resultado() {
   // TEXTO
   const texto = document.createElement("a-text");
 
-  texto.setAttribute(
-    "value",
-    `Quiz Finalizado!\nPontuação: ${pontos}`
-  );
+const total =
+Number(localStorage.getItem("pontuacao")) || 0;
+
+texto.setAttribute(
+  "value",
+  `Quiz Finalizado!\nPontuação Total: ${total}`
+);
 
   texto.setAttribute("align", "center");
   texto.setAttribute("color", "#38bdf8");
@@ -272,7 +296,7 @@ function resultado() {
   // AÇÃO
   botao.addEventListener("click", () => {
 
-    window.location.href = "index.html";
+   window.location.href = "laboratorio.html";
 
   });
 

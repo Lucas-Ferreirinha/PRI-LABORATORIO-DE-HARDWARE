@@ -83,7 +83,7 @@ const perguntas = [
 ];
 
 let atual = 0;
-let pontos = 0;
+let pontosQuiz = 0;
 
 const quiz = document.getElementById("quiz");
 
@@ -131,7 +131,10 @@ function renderizar() {
   // ==============================
   const score = document.createElement("a-text");
 
-  score.setAttribute("value", `Pontos: ${pontos}`);
+ score.setAttribute(
+  "value",
+  `Pontos neste quiz: ${pontosQuiz}`
+);
   score.setAttribute("position", "-2.2 3.2 -3");
   score.setAttribute("color", "#ffffff");
   score.setAttribute("width", "4");
@@ -192,7 +195,7 @@ function renderizar() {
 
         btn.setAttribute("color", "#22c55e");
 
-        pontos += 10;
+        pontosQuiz += 10;
 
       }
 
@@ -240,6 +243,24 @@ function resultado() {
 
   limpar();
 
+  if (!localStorage.getItem("quiz_cpu_concluido")) {
+
+  let pontosGerais =
+  Number(localStorage.getItem("pontuacao")) || 0;
+
+  pontosGerais += pontosQuiz;
+
+  localStorage.setItem(
+    "pontuacao",
+    pontosGerais
+  );
+
+  localStorage.setItem(
+    "quiz_cpu_concluido",
+    "true"
+  );
+}
+
   // PAINEL
   const painel = document.createElement("a-plane");
 
@@ -254,11 +275,13 @@ function resultado() {
 
   // TEXTO
   const txt = document.createElement("a-text");
+const total =
+Number(localStorage.getItem("pontuacao")) || 0;
 
-  txt.setAttribute(
-    "value",
-    `Quiz Finalizado!\nPontuacao: ${pontos}`
-  );
+txt.setAttribute(
+  "value",
+  `Quiz Finalizado!\nPontuacao Total: ${total}`
+);
 
   txt.setAttribute("align", "center");
   txt.setAttribute("color", "#38bdf8");
@@ -297,7 +320,7 @@ function resultado() {
   // AÇÃO
   btn.addEventListener("click", () => {
 
-    window.location.href = "index.html";
+   window.location.href = "laboratorio.html";
 
   });
 

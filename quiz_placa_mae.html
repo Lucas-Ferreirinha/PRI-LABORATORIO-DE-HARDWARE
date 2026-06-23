@@ -1,48 +1,40 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Quiz VR - Placa-mãe</title>
+<meta charset="UTF-8">
+<title>Quiz VR - Placa Mae</title>
 
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #050816;
-    }
-  </style>
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#050816;
+}
+</style>
+
 </head>
 
 <body>
 
-<a-scene background="color: #050816">
+<a-scene background="color:#050816">
 
-  <!-- LUZ -->
-  <a-light type="ambient" intensity="1"></a-light>
-
-  <!-- CÂMERA -->
-  <a-entity>
+    <a-light type="ambient" intensity="1"></a-light>
 
     <a-camera
-      position="0 1.6 0"
-      raycaster="objects: .clickable">
+        position="0 1.6 0"
+        raycaster="objects: .clickable">
 
-      <!-- CURSOR -->
-      <!-- PRECISA OLHAR 2 SEGUNDOS -->
-      <a-cursor
-        fuse="true"
-        fuse-timeout="2000"
-        color="#f59e0b">
-      </a-cursor>
+        <a-cursor
+            fuse="true"
+            fuse-timeout="2000"
+            color="#f59e0b">
+        </a-cursor>
 
     </a-camera>
 
-  </a-entity>
-
-  <!-- QUIZ -->
-  <a-entity id="quiz"></a-entity>
+    <a-entity id="quiz"></a-entity>
 
 </a-scene>
 
@@ -50,265 +42,256 @@
 
 const perguntas = [
 
-  {
-    pergunta: "Qual é a funcao da placa-mae?",
-    opcoes: [
-      "Conectar todos os componentes",
-      "Armazenar arquivos",
-      "Resfriar o sistema"
+{
+    pergunta:"Qual e a funcao da placa mae?",
+    opcoes:[
+        "Conectar os componentes",
+        "Resfriar o processador",
+        "Armazenar arquivos"
     ],
-    correta: 0
-  },
+    correta:0
+},
 
-  {
-    pergunta: "Qual componente e instalado na placa-mae?",
-    opcoes: [
-      "Processador",
-      "Monitor",
-      "Teclado"
+{
+    pergunta:"Qual componente e instalado na placa mae?",
+    opcoes:[
+        "Processador",
+        "Monitor",
+        "Mouse"
     ],
-    correta: 0
-  },
+    correta:0
+},
 
-  {
-    pergunta: "A placa-mae e responsavel por:",
-    opcoes: [
-      "Comunicacao entre componentes",
-      "Apenas armazenar dados",
-      "Gerar energia"
+{
+    pergunta:"A placa mae permite a comunicacao entre:",
+    opcoes:[
+        "Todos os componentes",
+        "Somente o monitor",
+        "Somente o teclado"
     ],
-    correta: 0
-  }
+    correta:0
+},
+
+{
+    pergunta:"Qual destes e conectado diretamente na placa mae?",
+    opcoes:[
+        "Memoria RAM",
+        "Caixa de som",
+        "Impressora"
+    ],
+    correta:0
+},
+
+{
+    pergunta:"Sem a placa mae o computador:",
+    opcoes:[
+        "Nao funciona corretamente",
+        "Fica mais rapido",
+        "Ganha mais memoria"
+    ],
+    correta:0
+}
 
 ];
 
 let atual = 0;
-let pontos = 0;
+let pontosQuiz = 0;
 
 const quiz = document.getElementById("quiz");
 
-// ==============================
-// LIMPAR TELA
-// ==============================
-function limpar() {
-
-  quiz.innerHTML = "";
-
+function limpar(){
+    quiz.innerHTML = "";
 }
 
-// ==============================
-// RENDERIZAR QUIZ
-// ==============================
-function renderizar() {
+function renderizar(){
 
-  limpar();
+    limpar();
 
-  // FINAL
-  if (atual >= perguntas.length) {
+    if(atual >= perguntas.length){
+        resultado();
+        return;
+    }
 
-    resultado();
-    return;
+    const q = perguntas[atual];
 
-  }
+    const titulo = document.createElement("a-text");
 
-  const q = perguntas[atual];
+    titulo.setAttribute("value", q.pergunta);
+    titulo.setAttribute("position", "0 2.5 -3");
+    titulo.setAttribute("align", "center");
+    titulo.setAttribute("color", "#f59e0b");
+    titulo.setAttribute("width", "6");
 
-  // ==============================
-  // PERGUNTA
-  // ==============================
-  const titulo = document.createElement("a-text");
+    quiz.appendChild(titulo);
 
-  titulo.setAttribute("value", q.pergunta);
-  titulo.setAttribute("position", "0 2.5 -3");
-  titulo.setAttribute("align", "center");
-  titulo.setAttribute("color", "#f59e0b");
-  titulo.setAttribute("width", "6");
+    const score = document.createElement("a-text");
 
-  quiz.appendChild(titulo);
-
-  // ==============================
-  // PONTUAÇÃO
-  // ==============================
-  const score = document.createElement("a-text");
-
-  score.setAttribute("value", `Pontos: ${pontos}`);
-  score.setAttribute("position", "-2.2 3.2 -3");
-  score.setAttribute("color", "#ffffff");
-  score.setAttribute("width", "4");
-
-  quiz.appendChild(score);
-
-  // ==============================
-  // OPÇÕES
-  // ==============================
-  q.opcoes.forEach((op, i) => {
-
-    const container = document.createElement("a-entity");
-
-    container.setAttribute(
-      "position",
-      `0 ${1.8 - i * 0.9} -3`
+    score.setAttribute(
+        "value",
+        `Pontos neste quiz: ${pontosQuiz}`
     );
 
-    // BOTÃO
-    const btn = document.createElement("a-plane");
+    score.setAttribute("position", "-2.2 3.2 -3");
+    score.setAttribute("color", "#ffffff");
+    score.setAttribute("width", "4");
 
-    btn.setAttribute("width", "4");
-    btn.setAttribute("height", "0.75");
-    btn.setAttribute("color", "#f59e0b");
-    btn.setAttribute("class", "clickable");
+    quiz.appendChild(score);
 
-    btn.setAttribute(
-      "material",
-      "shader:flat; opacity:0.9"
-    );
+    q.opcoes.forEach((op,i)=>{
 
-    // TEXTO
-    const txt = document.createElement("a-text");
+        const container =
+        document.createElement("a-entity");
 
-    txt.setAttribute("value", op);
-    txt.setAttribute("align", "center");
-    txt.setAttribute("color", "#ffffff");
-    txt.setAttribute("width", "6");
-    txt.setAttribute("position", "0 0 0.05");
+        container.setAttribute(
+            "position",
+            `0 ${1.8 - i*0.9} -3`
+        );
 
-    container.appendChild(btn);
-    container.appendChild(txt);
+        const btn =
+        document.createElement("a-plane");
 
-    // EVITA MULTIPLOS CLIQUES
-    let respondido = false;
+        btn.setAttribute("width","4");
+        btn.setAttribute("height","0.75");
+        btn.setAttribute("color","#06b6d4");
+        btn.setAttribute("class","clickable");
 
-    // ==============================
-    // RESPOSTA
-    // ==============================
-    container.addEventListener("click", () => {
+        const txt =
+        document.createElement("a-text");
 
-      if (respondido) return;
+        txt.setAttribute("value",op);
+        txt.setAttribute("align","center");
+        txt.setAttribute("color","#ffffff");
+        txt.setAttribute("width","6");
+        txt.setAttribute("position","0 0 0.05");
 
-      respondido = true;
+        container.appendChild(btn);
+        container.appendChild(txt);
 
-      // CORRETA
-      if (i === q.correta) {
+        let respondido = false;
 
-        btn.setAttribute("color", "#22c55e");
+        container.addEventListener("click",()=>{
 
-        pontos += 10;
+            if(respondido) return;
 
-      }
+            respondido = true;
 
-      // ERRADA
-      else {
+            if(i === q.correta){
 
-        btn.setAttribute("color", "#ef4444");
+                btn.setAttribute(
+                    "color",
+                    "#22c55e"
+                );
 
-      }
+                pontosQuiz += 10;
 
-      // MOSTRA QUAL ERA A CERTA
-      const botoes = quiz.querySelectorAll("a-plane");
+            }else{
 
-      botoes.forEach((b, index) => {
+                btn.setAttribute(
+                    "color",
+                    "#ef4444"
+                );
 
-        if (index === q.correta) {
+            }
 
-          b.setAttribute("color", "#22c55e");
+            setTimeout(()=>{
 
-        }
+                atual++;
 
-      });
+                renderizar();
 
-      // ESPERA MAIS TEMPO
-      setTimeout(() => {
+            },3000);
 
-        atual++;
+        });
 
-        renderizar();
-
-      }, 3500);
+        quiz.appendChild(container);
 
     });
 
-    quiz.appendChild(container);
+}
 
-  });
+function resultado(){
+
+    limpar();
+
+    if(!localStorage.getItem("quiz_mb_concluido")){
+
+        let pontosGerais =
+        Number(localStorage.getItem("pontuacao")) || 0;
+
+        pontosGerais += pontosQuiz;
+
+        localStorage.setItem(
+            "pontuacao",
+            pontosGerais
+        );
+
+        localStorage.setItem(
+            "quiz_mb_concluido",
+            "true"
+        );
+
+    }
+
+    const total =
+    Number(localStorage.getItem("pontuacao")) || 0;
+
+    const painel =
+    document.createElement("a-plane");
+
+    painel.setAttribute("width","5");
+    painel.setAttribute("height","3");
+    painel.setAttribute("position","0 1.6 -3");
+    painel.setAttribute("color","#0b1220");
+
+    const texto =
+    document.createElement("a-text");
+
+    texto.setAttribute(
+        "value",
+        `Quiz Finalizado!\nPontuacao Total: ${total}`
+    );
+
+    texto.setAttribute("align","center");
+    texto.setAttribute("color","#f59e0b");
+    texto.setAttribute("width","6");
+    texto.setAttribute("position","0 0.6 0.01");
+
+    const botao =
+    document.createElement("a-plane");
+
+    botao.setAttribute("width","2.6");
+    botao.setAttribute("height","0.8");
+    botao.setAttribute("position","0 -0.6 0.01");
+    botao.setAttribute("color","#f59e0b");
+    botao.setAttribute("class","clickable");
+
+    const textoBotao =
+    document.createElement("a-text");
+
+    textoBotao.setAttribute(
+        "value",
+        "Voltar ao laboratorio"
+    );
+
+    textoBotao.setAttribute("align","center");
+    textoBotao.setAttribute("color","#ffffff");
+    textoBotao.setAttribute("width","5");
+
+    botao.appendChild(textoBotao);
+
+    botao.addEventListener("click",()=>{
+
+        window.location.href = "laboratorio.html";
+
+    });
+
+    painel.appendChild(texto);
+    painel.appendChild(botao);
+
+    quiz.appendChild(painel);
 
 }
 
-// ==============================
-// RESULTADO FINAL
-// ==============================
-function resultado() {
-
-  limpar();
-
-  // PAINEL
-  const painel = document.createElement("a-plane");
-
-  painel.setAttribute("width", "5");
-  painel.setAttribute("height", "3");
-  painel.setAttribute("position", "0 1.6 -3");
-
-  painel.setAttribute(
-    "material",
-    "color:#0b1220; opacity:0.95; shader:flat"
-  );
-
-  // TEXTO
-  const txt = document.createElement("a-text");
-
-  txt.setAttribute(
-    "value",
-    `Quiz Finalizado!\nPontuacao: ${pontos}`
-  );
-
-  txt.setAttribute("align", "center");
-  txt.setAttribute("color", "#f59e0b");
-  txt.setAttribute("width", "6");
-  txt.setAttribute("position", "0 0.6 0.01");
-
-  // BOTÃO
-  const btn = document.createElement("a-plane");
-
-  btn.setAttribute("width", "2.6");
-  btn.setAttribute("height", "0.8");
-  btn.setAttribute("position", "0 -0.6 0.01");
-  btn.setAttribute("color", "#f59e0b");
-  btn.setAttribute("class", "clickable");
-
-  btn.setAttribute(
-    "material",
-    "shader:flat; opacity:0.9"
-  );
-
-  // TEXTO BOTÃO
-  const bt = document.createElement("a-text");
-
-  bt.setAttribute(
-    "value",
-    "Voltar ao laboratorio"
-  );
-
-  bt.setAttribute("align", "center");
-  bt.setAttribute("color", "#ffffff");
-  bt.setAttribute("width", "5");
-  bt.setAttribute("position", "0 0 0.05");
-
-  btn.appendChild(bt);
-
-  // AÇÃO
-  btn.addEventListener("click", () => {
-
-    window.location.href = "index.html";
-
-  });
-
-  painel.appendChild(txt);
-  painel.appendChild(btn);
-
-  quiz.appendChild(painel);
-
-}
-
-// INICIAR
 renderizar();
 
 </script>
