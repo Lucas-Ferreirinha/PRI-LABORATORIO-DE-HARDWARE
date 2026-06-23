@@ -1,202 +1,120 @@
-# 🧠 Laboratório VR Futurista IF
+Laboratório VR Educativo
 
-## 📌 Sobre o projeto
+Este projeto é um ambiente de realidade virtual desenvolvido com A-Frame, com foco em ensino interativo sobre componentes de hardware de computadores.
 
-Este projeto é um **laboratório virtual em 3D (VR)** desenvolvido com **A-Frame (WebVR)** com o objetivo de ensinar de forma interativa os principais componentes de um computador.
+O usuário explora um laboratório 3D, interage com objetos e responde quizzes para ganhar pontos.
 
-O usuário pode explorar o ambiente, interagir com objetos olhando por 2 segundos e responder quizzes educativos sobre hardware.
+Estrutura do sistema
 
----
+O sistema é baseado em uma lista de componentes definida em JavaScript.
 
-# 🚀 Funcionalidades
+Cada componente possui as seguintes propriedades:
 
-- 🧑‍💻 Ambiente VR em 3D
-- 🖥️ Componentes de computador interativos
-- 👁️ Interação por olhar (cursor com fuse de 2 segundos)
-- 🧪 Sistema de quizzes por componente
-- 🏆 Sistema de pontuação salvo no navegador
-- 🎨 Interface neon futurista
+Nome
+Descrição
+Tipo (usado para imagem/identificação)
+Link do quiz correspondente
+Cor temática
 
----
+Esses dados são armazenados em um array chamado COMPONENTES.
 
-# ⚙️ Tecnologias usadas
+Estrutura dos componentes
 
-- HTML5
-- CSS3
-- JavaScript
-- A-Frame (WebVR)
+Cada item segue o padrão:
 
----
+name: nome do componente
+desc: descrição educativa
+type: identificador da imagem
+link: página do quiz
+color: cor do botão/interação
+Geração automática
 
-# 🧱 Estrutura do projeto
+O sistema utiliza um loop:
 
-index.html → Laboratório VR principal  
-tutorial.html → Página inicial com instruções  
-quiz_cpu.html → Quiz do processador  
-quiz_gpu.html → Quiz da GPU  
-quiz_ram.html → Quiz da memória RAM  
-quiz_hd.html → Quiz do armazenamento  
-images/ → Imagens dos componentes  
+COMPONENTES.forEach(...)
 
----
+Esse loop cria automaticamente no cenário:
 
-# 🧠 Como o código funciona
+Base do objeto
+Imagem do componente
+Texto (nome e descrição dinâmica)
+Botão de interação
+Evento de clique para iniciar quiz
 
-## 🌍 1. Cena VR
+Esse modelo permite fácil expansão sem duplicação de código.
 
-O ambiente é criado com:
+Interação no ambiente VR
 
-<a-scene>
+A interação é baseada em olhar do usuário (gaze interaction):
 
-Dentro dele estão:
-- luzes
-- chão
-- paredes
-- componentes
-- câmera
+O cursor utiliza fuse
+O usuário olha para o objeto por 2 segundos
+A ação é executada automaticamente
 
----
+Isso permite uso sem teclado ou mouse.
 
-## 💡 2. Iluminação
+Sistema de pontuação
 
-O projeto usa:
-- luz ambiente
-- luz direcional
-- luzes pontuais neon
+A pontuação do usuário é armazenada usando localStorage.
 
-Isso cria o efeito futurista do laboratório.
+Isso garante:
 
----
+Persistência de pontos mesmo após recarregar a página
+Continuidade da experiência
+Possibilidade de evolução do usuário
+Como adicionar novos componentes
 
-## 🖥️ 3. Componentes
+Para adicionar um novo item ao laboratório, basta incluir um novo objeto no array COMPONENTES.
 
-Os componentes são definidos em um array JavaScript:
+Exemplo:
 
-const COMPONENTES = [
-  {
-    name: "Processador",
-    desc: "Executa instruções do computador.",
-    type: "cpu",
-    link: "quiz_cpu.html",
-    color: "#38bdf8"
-  }
-];
+name: Fonte de Energia
+desc: Distribui energia para todos os componentes do computador
+type: fonte
+link: quiz_fonte.html
+color: cor desejada
+Requisitos para novos componentes
 
-Cada componente possui:
-- nome
-- descrição
-- imagem
-- link do quiz
-- cor do tema
+Ao adicionar um novo item, também é necessário:
 
----
+Adicionar a imagem correspondente em a-assets
+Criar o arquivo do quiz correspondente
+Manter o padrão de nomenclatura consistente
+Sistema de posicionamento
 
-## 🔁 4. Criação automática
+Os componentes são distribuídos automaticamente no cenário usando um array de posições:
 
-O código usa:
+POSICOES = [-7.5, -4.5, -1.5, 1.5, 4.5, 7.5]
 
-COMPONENTES.forEach((comp, i) => {
+Cada valor representa uma estação no laboratório.
 
-Isso cria automaticamente:
-- mesa
-- imagem 3D
-- texto
-- botão de quiz
-- interação por hover (mostrar descrição)
-- clique para abrir quiz
+Expansão do sistema
 
----
+O sistema pode ser expandido facilmente:
 
-## 👁️ 5. Interação VR
+Adicionando mais posições no array
+Inserindo novos componentes no vetor
+Criando novos quizzes associados
 
-O usuário interage com:
+Não é necessário alterar a lógica principal.
 
-<a-cursor fuse="true" fuse-timeout="2000">
-
-Isso significa:
-- olhar para o objeto
-- esperar 2 segundos
-- ação é ativada automaticamente
-
----
-
-## 🏆 6. Sistema de pontuação
-
-A pontuação é salva usando:
-
-localStorage
-
-Isso permite:
-- manter pontos mesmo recarregando a página
-- experiência contínua
-
----
-
-# ➕ Como adicionar novos componentes
-
-Basta editar o array:
-
-{
-  name: "Fonte de Energia",
-  desc: "Distribui energia para o computador.",
-  type: "fonte",
-  link: "quiz_fonte.html",
-  color: "#f97316"
-}
-
----
-
-## ⚠️ IMPORTANTE
-
-### 1. Adicionar imagem
-
-<img id="fonte" src="images/fonte.png">
-
----
-
-### 2. Criar quiz
-
-quiz_fonte.html
-
----
-
-## 📍 Posicionamento automático
-
-const POSICOES = [-7.5, -4.5, -1.5, 1.5, 4.5, 7.5];
-
-Cada posição representa uma estação no laboratório.
-
----
-
-## ➕ Como adicionar mais de 6 itens
-
-const POSICOES = [-10, -7, -4, -1, 2, 5, 8, 11];
-
-O sistema se adapta automaticamente.
-
----
-
-# 🎨 Melhorias futuras
-
-- 🔊 Sons ao interagir
-- ✨ Animações nos monitores
-- 🧑‍🏫 NPCs educativos
-- 🧪 mais quizzes
-- 📊 ranking de jogadores
-- 🌌 partículas e efeitos VR
-
----
-
-# 🧠 Resumo
-
-✔ Projeto VR educativo  
-✔ Componentes interativos  
-✔ Quizzes com pontuação  
-✔ Interface futurista  
-✔ Fácil de expandir  
-
----
-
-# 📌 Autor
-
-Projeto desenvolvido para fins educacionais utilizando tecnologias web (A-Frame + JavaScript).
+Possíveis melhorias futuras
+Sons interativos ao clicar
+Animações nos objetos
+NPCs educativos
+Sistema de ranking
+Partículas e efeitos visuais
+Transições entre fases
+Resumo
+
+O projeto apresenta:
+
+Ambiente VR educativo
+Interação por olhar (gaze)
+Sistema de quizzes integrado
+Pontuação persistente
+Estrutura modular e expansível
+Interface 3D interativa
+Observação
+
+Projeto desenvolvido com fins educacionais utilizando tecnologias web como A-Frame e JavaScript, voltado para ensino de hardware de computadores em ambiente imersivo.
